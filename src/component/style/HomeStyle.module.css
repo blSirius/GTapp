@@ -1,0 +1,14 @@
+h1{
+    color: blue;
+}
+
+.displayFlex{
+    display: flex;
+}
+.test1{
+    border: 1px black solid;
+    border-radius: 5px;
+    margin-top: 5%;
+    width: 50%;
+    color: blue;
+}
