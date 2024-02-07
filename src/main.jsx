@@ -53,7 +53,7 @@ const router = createBrowserRouter([
     element: <ProtectedRoute><Album /></ProtectedRoute>
   },
   {
-    path: '/viewEmp/:empID',
+    path: '/viewEmp/:name',
     element: <ViewEmp />
   },
   {

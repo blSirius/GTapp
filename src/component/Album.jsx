@@ -56,7 +56,7 @@ function Album() {
                                         <td>{data.employee_username}</td>
                                         {/* <td>{data.employee_email}</td> */}
                                         <td style={{ textAlign: 'center' }}>
-                                        <Button href={`/viewEmp/${data.employee_id}`} variant='success' style={{ width: '80%' }}>View</Button>
+                                        <Button href={`/viewEmp/${data.employee_name}`} variant='success' style={{ width: '80%' }}>View</Button>
                                         </td>
                                         <td style={{ textAlign: 'center' }}>
                                             <Button href={`/deleteEmp/${data.employee_id}`} variant='danger' style={{ width: '80%' }}>Delete</Button>

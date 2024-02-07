@@ -28,13 +28,13 @@ function DeleteEmp() {
   }, [empID]);
 
   const handleDelete = async () => {
-    try {
-      await axios.delete(`http://localhost:3000/deleteEmployee/${empID}`);
-      // Optionally, you can refresh the employee list or perform any other actions
-      navigate('/album');
-    } catch (error) {
-      console.error('Error deleting employee:', error);
-    }
+    // try {
+    //   await axios.delete(`http://localhost:3000/deleteEmployee/${empID}`);
+    //   // Optionally, you can refresh the employee list or perform any other actions
+    //   navigate('/album');
+    // } catch (error) {
+    //   console.error('Error deleting employee:', error);
+    // }
 
   };
 
