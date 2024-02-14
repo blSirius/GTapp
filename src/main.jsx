@@ -21,6 +21,7 @@ import NewCollection from './component/NewCollection.jsx';
 import ViewEmp from './component/ViewEmp.jsx';
 import DeleteEmp from './component/DeleteEmp.jsx';
 import Search from './component/Search.jsx';
+import Test from './component/Test.jsx';
 
 //create router
 const router = createBrowserRouter([
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
   {
     path: '/search/',
     element: <Search/>
+  },
+  {
+    path: '/test/',
+    element: <Test/>
   },
 
 ]);

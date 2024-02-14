@@ -42,7 +42,7 @@ function Album() {
                                 <tr>
                                     <th></th>
                                     <th>Name</th>
-                                    <th>Username</th>
+                        
                                     {/* <th>Email</th> */}
                                     <th style={styletest} colSpan="2">Actions</th>
                                 </tr>
@@ -53,7 +53,7 @@ function Album() {
                                     <tr key={key}>
                                         <td>{key+1}</td>
                                         <td>{data.employee_name}</td>
-                                        <td>{data.employee_username}</td>
+
                                         {/* <td>{data.employee_email}</td> */}
                                         <td style={{ textAlign: 'center' }}>
                                         <Button href={`/viewEmp/${data.employee_name}`} variant='success' style={{ width: '80%' }}>View</Button>
