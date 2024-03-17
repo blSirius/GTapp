@@ -1,4 +1,4 @@
-import React from 'react'
+import React  from 'react'
 
 //router
 import ReactDOM from 'react-dom/client';
@@ -21,7 +21,11 @@ import NewCollection from './component/NewCollection.jsx';
 import ViewEmp from './component/ViewEmp.jsx';
 import DeleteEmp from './component/DeleteEmp.jsx';
 import Search from './component/Search.jsx';
-import Test from './component/Test.jsx';
+import TestSearchPic from './component/TestSearchPic.jsx';
+import Modall from './component/ModalTest/Modal.jsx';
+// import Md from './component/ModalTest/Md.jsx';
+import Example from './component/tt.jsx';
+import Conclude from './component/Conclude.jsx';
 
 //create router
 const router = createBrowserRouter([
@@ -47,7 +51,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/newCollection',
-    element: <NewCollection />
+    element: <ProtectedRoute><Modall /></ProtectedRoute>
   },
   {
     path: '/viewEmp/',
@@ -66,13 +70,27 @@ const router = createBrowserRouter([
     element: <ProtectedRoute><Album /></ProtectedRoute>
   },
   {
-    path: '/search/',
+    path: '/history/',
     element: <Search/>
   },
   {
-    path: '/test/',
-    element: <Test/>
+    path: '/searchbyimg/',
+    element: <TestSearchPic/>
   },
+  {
+    path: '/tt/:name',
+    element: <Example/>
+  },
+  {
+    path: '/conclude',
+    element: <Conclude/>
+  },
+  {
+    path: '/history/:name',
+    element: <Search/>
+  },
+
+
 
 ]);
 

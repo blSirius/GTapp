@@ -3,83 +3,91 @@ import { Container } from 'react-bootstrap';
 import axios from 'axios';
 import NavBar from './nav/NavBar';
 import NewCollectionCSS from './style/NewCollection.module.css';
+// import React, { useState, useRef, useEffect } from 'react';
+import Cropper from 'react-cropper';
+import { useNavigate } from "react-router-dom";
+
+
+import ReactDOM from 'react-dom'
+import Avatar from 'react-avatar-edit'
+import 'cropperjs/dist/cropper.css';
 
 const NewCollection = () => {
   const [file, setFile] = useState(null);
   const [folderName, setFolderName] = useState('');
-  const [imagePreview, setImagePreview] = useState(null); // Re-add this state for the image preview
-  // const [email, setEmail] = useState('');
-  const canvasRef = useRef(null);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [startPoint, setStartPoint] = useState({ x: 0, y: 0 });
-  const [square, setSquare] = useState({ x: 0, y: 0, size: 50 }); // Default square state
-
-  // const [imagePreview, setImagePreview] = useState(null);
-  useEffect(() => {
-    if (imagePreview && canvasRef.current) {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-      const image = new Image();
-      
-      // When the image is loaded, draw it on the canvas
-      image.onload = () => {
-        canvas.width = image.width;
-        canvas.height = image.height;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(image, 0, 0);
-        
-        // Draw a square based on the square state
-        ctx.beginPath();
-        ctx.rect(square.x, square.y, square.size, square.size);
-        ctx.strokeStyle = 'red';
-        ctx.stroke();
-      };
-
-      // Set the source of the image to be the image preview URL
-      image.src = imagePreview;
+  const [image, setImage] = useState(null);
+  const [croppedImage, setCroppedImage] = useState(null);
+  const cropperRef = useRef(null);
+  const [test, setTest] = useState([])
+  const navigate = useNavigate()
+  useState(() => {
+    const getlabel = async () => {
+      try {
+        const res = await axios.get(import.meta.env.VITE_API + '/api/labels');
+        setTest(res.data);
+        // console.log(res.data);
+      }
+      catch (err) {
+        console.log(err);
+      }
     }
-  }, [imagePreview, square]);
+    getlabel();
+  }, [test])
 
-  const startDrawing = ({ nativeEvent }) => {
-    const { offsetX, offsetY } = nativeEvent;
-    setIsDrawing(true);
-    setStartPoint({ x: offsetX, y: offsetY });
+
+
+  const onCrop = () => {
+    const imageElement = cropperRef.current;
+    const cropper = imageElement?.cropper;
+    setCroppedImage(cropper.getCroppedCanvas({
+      width: 300, // Set the width of the cropped canvas
+      height: 300, // Set the height of the cropped canvas
+      minWidth: 100,
+      minHeight: 100,
+      maxWidth: 4096,
+      maxHeight: 4096,
+      fillColor: 'transparent', // Changed from '#fff' to 'transparent'
+      imageSmoothingEnabled: true,
+      imageSmoothingQuality: 'high',
+    }).toDataURL('image/png')); // Specify the image format if it's not already PNG
   };
 
-  const drawSquare = ({ nativeEvent }) => {
-    if (!isDrawing) return;
-
-    const { offsetX, offsetY } = nativeEvent;
-    // Calculate the size based on the distance from the starting point
-    const size = Math.max(Math.abs(offsetX - startPoint.x), Math.abs(offsetY - startPoint.y));
-    setSquare({ x: startPoint.x, y: startPoint.y, size });
-  };
-
-  const finishDrawing = () => {
-    setIsDrawing(false);
-  };
   const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
-    setFile(selectedFile);
-
-    // Create a URL for the file
-    const previewURL = URL.createObjectURL(selectedFile);
-    setImagePreview(previewURL); // Update the image preview URL
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => setImage(e.target.result);
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleUpload = async () => {
-    if (!file) {
+    if (!folderName) {
+      window.alert('Please enter name.');
+      return;
+    }
+    if (!croppedImage) {
+      window.alert('Please select a file before uploading.');
       console.error('Please select a file.');
       return;
     }
 
+    const isFolderNameDuplicate = test.some(testItem => folderName === testItem.label);
+    if (isFolderNameDuplicate) {
+      window.alert('ชื่อ Folder ซ้ำ');
+      return; // หยุดการทำงานหากพบชื่อซ้ำ
+    }
     createEmployeeFolder();
     createEmployeeDB();
+    // go to <Album />
+
+    // navigate('/album')
+
   };
 
   const createEmployeeDB = async () => {
     try {
-      const res = await axios.post('http://localhost:3000/createEmployee', { name});
+      const res = await axios.post(import.meta.env.VITE_API + `/createEmployee/${folderName}`);
       console.log('create db successfully', res);
     }
     catch (err) {
@@ -88,24 +96,29 @@ const NewCollection = () => {
   }
 
   const createEmployeeFolder = async () => {
+    const response = await fetch(croppedImage);
+    const blob = await response.blob();
     const formData = new FormData();
-    console.log(file);
-    formData.append('labels', file);
-    formData.append('folderName', folderName || 'defaultFolder');
-
+    formData.append('croppedImage', blob, 'image.png'); // Ensure 'croppedImage' matches the server's expected field name
+    formData.append('folderName', folderName);
+    console.log(Array.from(formData));
     try {
-      const { data } = await axios.post('http://localhost:3000/updateImageFolder', formData);
-      console.log('Server response:', data);
+      const response = await axios.post(import.meta.env.VITE_API + '/updateImageFolder', formData, {
+        headers: {
+          // Axios will set the correct content type for multipart/form-data automatically
+        },
+      });
+      console.log('Server response:', response.data);
     } catch (error) {
-      console.error('Error:', error.message || 'Failed to upload image.');
+      console.error('Error:', error);
     }
-  }
+  };
 
   return (
     <>
       <NavBar />
-      <Container className={NewCollectionCSS.container} >
-        <div style={{ marginTop: '100px' }} ></div>
+      <Container>
+        <div style={{ marginTop: '50px' }} ></div>
         <div>
           <label htmlFor="">Name, folderName</label>
           <input
@@ -114,30 +127,36 @@ const NewCollection = () => {
             value={folderName}
             className={NewCollectionCSS.label_input}
             onChange={(e) => setFolderName(e.target.value)}
-          />
+            required />
         </div>
-
-        <br />
         <input type="file" onChange={handleFileChange} />
-        <br />
-        <br />
-        <canvas 
-          ref={canvasRef}
-          onMouseDown={startDrawing}
-          onMouseMove={drawSquare}
-          onMouseUp={finishDrawing}
-          onMouseLeave={finishDrawing}
-          className={NewCollectionCSS.canvas}
-        />
-        {/* {imagePreview && (
-          <img
-            src={imagePreview}
-            alt="Image Preview"
-            className={NewCollectionCSS.imagePreview} // You might need to add some CSS for this
-          />
-        )} */}
-        {/* Image preview will be shown here */}
-        <button className={NewCollectionCSS.button} onClick={handleUpload}>Upload</button>
+
+        <button style={{ marginTop: '20px', marginBottom: '20px' }}
+          onClick={handleUpload}>Upload</button>
+  <div className={NewCollectionCSS['img-container']}>
+  {/* This div contains the original image with the cropper */}
+  <div>
+    <h3>Uncrop Img</h3>
+    {image && (
+      <Cropper
+        src={image}
+        className={NewCollectionCSS['cropper-container']}
+        initialAspectRatio={1}
+        guides={false}
+        crop={onCrop}
+        ref={cropperRef}
+      />
+    )}
+  </div>
+
+  {/* This div contains the cropped image */}
+  {croppedImage && (
+    <div>
+      <h3>Cropped Image:</h3>
+      <img src={croppedImage} className={NewCollectionCSS['croppedImage']} alt="Cropped" />
+    </div>
+  )}
+</div>
       </Container>
     </>
   );

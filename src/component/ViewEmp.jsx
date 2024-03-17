@@ -9,6 +9,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 function ViewEmp() {
 
   const { name } = useParams();
+  // console.log(name)
   const styletest = {
     textAlign: "center"
   }
@@ -17,7 +18,7 @@ function ViewEmp() {
   useEffect(() => {
     const getDetect = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/getEmpDetect/${name}`);
+        const res = await axios.get(import.meta.env.VITE_API + `/getEmpDetect/${name}`);
         if (Array.isArray(res.data)) {
           setDetect(res.data);
         } else {
@@ -27,46 +28,19 @@ function ViewEmp() {
         console.error('Error fetching data:', err);
       }
     };
-
-    // const fetchImages = async () => {
-    //   try {
-    //     const response = await axios.get(`http://localhost:3000/getImageFolder/${encodeURIComponent(name)}`);
-    //     setImageUrls(response.data);
-    //   } catch (error) {
-    //     console.error('Error fetching images:', error);
-    //   }
-    // };
-    // fetchImages();
-
-
     getDetect()
   }, [name]);
-  const getImagePath = (name, single_img) => {
-    const trimmedName = name.trim();
-    return `http://localhost:3000/getDetectedSingleFaceFolder/${encodeURIComponent(trimmedName)}/${single_img}`;
+  const getImagePath = (single_img) => {
+    console.log(single_img)
+    return import.meta.env.VITE_API + `/labeled_images/${single_img}`;
   };
 
-  // const getImageFolder = (name) => {
-  //   const trimmedName = name.trim();
-  //   return `http://localhost:3000/getImageFolder/${encodeURIComponent(trimmedName)}`;
-  // };
-  // console.log(detail)
-  // if (!detail) {
-  //   return <div><NavBar />May be it has a BUG!!</div>;
-  // }
+
 
   return (
     <div>
       <NavBar />
-      <h1 style={styletest}>Labels</h1>
-      {/* <Container>
-        <div>
-          {imageUrls.map((url, index) => (
-            
-            <img key={index} src={url} alt={`Employee ${name} ${index + 1}`} style={{ margin: '10px' }} />
-          ))}
-        </div>
-      </Container> */}
+
       <h1 style={styletest}>History</h1>
       <Container>
         <div className={ViewCSS.table}>
@@ -89,7 +63,7 @@ function ViewEmp() {
                   <td>{data.expression}</td>
                   <td>{data.date}</td>
                   <td>{data.time}</td>
-                  <td><img width={100} height={100} style={{ borderRadius: '0.5rem' }} src={getImagePath(data.name, data.single_img)} alt="" /></td>
+                  <td><img width={100} height={100} style={{ borderRadius: '0.5rem' }} src={getImagePath(data.path)} alt="" /></td>
                 </tr>
               ))}
             </tbody>

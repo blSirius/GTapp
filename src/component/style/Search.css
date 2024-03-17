@@ -1,0 +1,52 @@
+/* Main alignment container */
+.ac {
+    display: flex;
+    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+    gap: 1rem; /* Spacing between flex items */
+    justify-content: center; /* Centers items horizontally */
+    margin-top: 1rem; /* Spacing from the top of the container */
+  }
+  
+  /* Table container */
+  .tb {
+    flex: 1; /* Allows the table container to fill available space */
+    min-width: 300px; /* Minimum width to ensure content is readable */
+  }
+  
+  /* Image styles within table */
+  img {
+    width: auto; /* Auto width to maintain aspect ratio */
+    height: 75px; /* Fixed height for uniformity */
+    border-radius: 0.5rem; /* Rounded corners for the images */
+  }
+  
+  /* Pagination styling */
+  .pagination {
+    display: flex;
+    justify-content: center; /* Center pagination controls */
+    padding: 1rem 0; /* Padding above and below the pagination */
+  }
+  
+  .pagination .page-item .page-link {
+    /* color: #007bff; */
+    margin: 0 0.25rem; /* Spacing between pagination items */
+  }
+  
+  .pagination .page-item.active .page-link {
+    background-color: #007bff; /* Bootstrap primary background color for active state */
+    border-color: #007bff; /* Bootstrap primary border color for active state */
+  }
+  
+  /* Chart and additional information area */
+  h3 {
+    color: #333; /* Dark color for headings for better contrast */
+    margin-bottom: 1rem; /* Spacing below the heading */
+  }
+  
+  /* Additional styles for responsiveness */
+  @media (max-width: 768px) {
+    .ac {
+      flex-direction: column; /* Stack items vertically on smaller screens */
+    }
+  }
+  

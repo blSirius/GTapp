@@ -12,7 +12,7 @@ function Home() {
     useEffect(() => {
         const getDetect = async () => {
             try {
-                const res = await axios.get('http://localhost:3000/getFaceDetectedHome');
+                const res = await axios.get(import.meta.env.VITE_API + '/getFaceDetectedHome');
                 setDetect(res.data);
                 console.log(res.data);
             } catch (err) {
@@ -22,9 +22,11 @@ function Home() {
 
         getDetect();
     }, []);
-    const getImagePath = (name, single_img) => {
-        const trimmedName = name.trim();
-        return `http://localhost:3000/getDetectedSingleFaceFolder/${encodeURIComponent(trimmedName)}/${single_img}`;
+
+    //ค้างไว้ตรงนี้
+    const getImagePath = (single_img) => {
+        console.log(single_img)
+        return import.meta.env.VITE_API + `/getDetectedSingleFaceKnown/${single_img}`;
     };
     return (
         <>
@@ -54,7 +56,7 @@ function Home() {
                                             <td>{data.expression}</td>
                                             <td>{data.date}</td>
                                             <td>{data.time}</td>
-                                            <td><img width={100} height={100} style={{ borderRadius: '0.5rem' }} src={getImagePath(data.name, data.single_img)} alt="" /></td>
+                                            <td><img width={100} height={100} style={{ borderRadius: '0.5rem' }} src={getImagePath(data.path)} alt="" /></td>
                                         </tr>
                                     ))}
                                 </tbody>

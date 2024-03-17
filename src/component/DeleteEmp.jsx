@@ -16,7 +16,7 @@ function DeleteEmp() {
   useEffect(() => {
     const getEmployee = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/getEmployeeDetail/${empID}`);
+        const res = await axios.get(import.meta.env.VITE_API + `/getEmployeeDetail/${empID}`);
         setDetail(res.data);
         console.log(res.data);
       } catch (err) {
@@ -29,7 +29,7 @@ function DeleteEmp() {
 
   const handleDelete = async () => {
     // try {
-    //   await axios.delete(`http://localhost:3000/deleteEmployee/${empID}`);
+    //   await axios.delete(import.meta.env.VITE_API + `/deleteEmployee/${empID}`);
     //   // Optionally, you can refresh the employee list or perform any other actions
     //   navigate('/album');
     // } catch (error) {

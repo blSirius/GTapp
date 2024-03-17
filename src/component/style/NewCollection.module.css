@@ -7,23 +7,34 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds a slight shadow for depth */
 }
 
+.img-container {
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+}
+
+.label_input{
+  
+}
 
 
 .croppedImage {
   display: block;
-  max-width: 100%; /* Makes sure the image is not wider than its container */
-  height: auto; /* Keeps the image's aspect ratio */
-  margin: 20px auto; /* Centers the image and adds some spacing above and below */
-  border: 1px solid #ddd; /* Optional: adds a border around the image */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds a shadow for depth */
-  border-radius: 4px; /* Optional: rounds the corners */
+  max-width: 100%;
+  width: 100%; 
+  height: auto; 
+  margin: 20px auto; 
+  border: 1px solid #ddd; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+  border-radius: 4px; 
 }
 
 
 .cropper-container {
-  max-width: 100%;
-  height: auto;
-  margin: 0 auto; 
+  max-width: 50%; 
+  height: auto; /* Keeps the image's aspect ratio */
+  margin: 20px; /* Adds some spacing */
+  /* Remove display: block; from .croppedImage if it exists */
 }
 
 
@@ -35,4 +46,5 @@
 
 .cropper-dashed, .cropper-point {
   display: none;
+  flex-direction: column;
 }

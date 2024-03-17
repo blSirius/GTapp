@@ -1,4 +1,4 @@
-import React, { createContext, useContext,  useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import axios from 'axios';
 
 const UserAuthContext = createContext();
@@ -11,7 +11,7 @@ export const UserAuthContextProvider = ({ children }) => {
 
     if (!token) { return null; }
     try {
-      const response = await axios.post('http://localhost:3000/decodeToken', { token });
+      const response = await axios.post(import.meta.env.VITE_API + '/decodeToken', { token });
       const currentUser = response.data.decoded.username;
       setUser(currentUser);
       return currentUser;
@@ -22,7 +22,7 @@ export const UserAuthContextProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post('http://localhost:3000/login', { username, password });
+      const response = await axios.post(import.meta.env.VITE_API + '/login', { username, password });
       localStorage.setItem('token', response.data.token);
     } catch (error) {
       console.error('Error during login:', error.response.data);
