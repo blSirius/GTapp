@@ -16,7 +16,7 @@ function Modall() {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    const [file, setFile] = useState(null);
+    const [fileoff, setFileoff] = useState(null);
     const [folderName, setFolderName] = useState('');
     const [image, setImage] = useState(null);
     const [croppedImage, setCroppedImage] = useState(null);
@@ -27,8 +27,6 @@ function Modall() {
     useState(() => {
         const MODEL_URL = '/models';
         Promise.all([
-            // faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
-            // faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
             faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
           ])
         const getlabel = async () => {
@@ -41,7 +39,18 @@ function Modall() {
             console.log(err);
           }
         }
+        const getOff = async () => {
+            try {
+              const res = await axios.get('http://localhost:3000/checknameOff');
+              setFileoff(res.data);
+              // console.log(res.data);
+            }
+            catch (err) {
+              console.log(err);
+            }
+          }
         getlabel();
+        getOff()
       }, [test])
 
     const handleFileChange = (event) => {
@@ -79,6 +88,11 @@ function Modall() {
 
         const isFolderNameDuplicate = test.some(testItem => folderName === testItem.label);
         if (isFolderNameDuplicate) {
+            window.alert('ชื่อ Folder ซ้ำ');
+            return; // หยุดการทำงานหากพบชื่อซ้ำ
+        }
+        const isFolderNameDuplicateOFF = fileoff.some(testItem => folderName === testItem.label);
+        if (isFolderNameDuplicateOFF) {
             window.alert('ชื่อ Folder ซ้ำ');
             return; // หยุดการทำงานหากพบชื่อซ้ำ
         }

@@ -275,6 +275,7 @@ export default function TestSearchPic() {
           <canvas ref={canvasRef} className="testSearchPicCanvas" />
           {namefile || picpng ? (
             <div className="tableContainer">
+              <input type='date' />
               <Table style={{ marginTop: '3rem' }} hover>
                 <thead >
                   <tr>

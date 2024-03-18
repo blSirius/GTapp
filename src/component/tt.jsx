@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import NavBar from "./nav/NavBar";
-import { Button,Table, Container } from 'react-bootstrap';
+import { Button, Table, Container } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
@@ -8,33 +8,50 @@ import './style/tt.css'
 import Cropper from 'react-cropper';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronCircleLeft,faChevronCircleRight } from '@fortawesome/free-solid-svg-icons'
+import { faChevronCircleLeft, faChevronCircleRight } from '@fortawesome/free-solid-svg-icons'
 // import NavBar from './nav/NavBar';
 import * as faceapi from 'face-api.js';
 
 const Example = () => {
+
   const { name } = useParams();
   const navigate = useNavigate()
+  const [folderName, setFolderName] = useState(null)
+  const [status, setStatus] = useState('on')
+  const [alllabelname, setAlllabelname] = useState([])
   const [detectt, setDetect] = useState([])
   useEffect(() => {
     const getDetect = async () => {
       try {
-        const res = await axios.get(import.meta.env.VITE_API + `/getEmpDetect/${name}`);
-        if (Array.isArray(res.data)) {
-          setDetect(res.data);
-        } else {
-          console.error('Data received is not an array:', res.data);
-        }
+        const res = await axios.get(import.meta.env.VITE_API + `/getEmployeeDetail/${name}`);
+        console.log(res)
+
+        setDetect(res.data);
+
       } catch (err) {
         console.error('Error fetching data:', err);
       }
     };
     getDetect()
-  }, [name]);
+  }, []);
 
-  const getImagePath = (name, path) => {
-    return import.meta.env.VITE_API + `/labeled_images/${path}`;
-  };
+  useState(() => {
+    const MODEL_URL = '/models';
+    Promise.all([
+      faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+    ])
+    const getlabel = async () => {
+      try {
+        const res = await axios.get(import.meta.env.VITE_API +'/api/labels');
+        setAlllabelname(res.data);
+        // console.log(res.data);
+      }
+      catch (err) {
+        console.log(err);
+      }
+    }
+    getlabel();
+  }, [alllabelname])
   const scrollableRef = useRef(null);
   const [isScrollVisible, setIsScrollVisible] = useState(false);
   const [croppedImage, setCroppedImage] = useState(null);
@@ -56,6 +73,57 @@ const Example = () => {
     }
   };
 
+  const changeName = async () => {
+    const isFolderNameDuplicate = alllabelname.some(testItem => folderName === testItem.label);
+    if (isFolderNameDuplicate) {
+      window.alert('ชื่อ Folder ซ้ำ');
+      return; // หยุดการทำงานหากพบชื่อซ้ำ
+    }
+    if (!folderName) {
+      window.alert('กรุณาใส่ชื่อ');
+      return;
+    }
+    const oldFolderName = name; // You need to get this from somewhere, e.g., state or props
+    const newFolderName = folderName; // The new folder name from the state
+
+    try {
+      const response = await axios.post(import.meta.env.VITE_API + '/renameFolder', { oldName: oldFolderName, newName: newFolderName });
+      console.log(response.data);
+      // Handle any additional UI updates or notifications here
+    } catch (error) {
+      console.error('Error renaming folder:', error);
+      // Handle displaying the error to the user here
+    }
+    try {
+      const response = await axios.post(import.meta.env.VITE_API + '/updateEmployeeName', { oldName: oldFolderName, newName: newFolderName });
+      console.log(response.data);
+      // Handle any additional UI updates or notifications here
+    } catch (error) {
+      console.error('Error renaming folder:', error);
+      // Handle displaying the error to the user here
+    }
+    navigate('/album')
+  }
+  const changeStatus = async () => {
+    const statusSelect = document.getElementById('sta');
+    const status = statusSelect.value;
+
+    try {
+      const res = await axios.post(import.meta.env.VITE_API + '/changeStatus', { folderName: name, status: status });
+      console.log(res.data);
+    } catch (error) {
+      console.error('Error changing status:', error);
+    }
+    try {
+      const response = await axios.post(import.meta.env.VITE_API + '/updateStatusDB', { folderName: name, status: status });
+      console.log(response.data);
+      // Handle any additional UI updates or notifications here
+    } catch (error) {
+      console.error('Error renaming folder:', error);
+      // Handle displaying the error to the user here
+    }
+    navigate('/album')
+  };
   const addImgtoFolder = async () => {
 
     const imageElement = cropperRef.current;
@@ -73,7 +141,7 @@ const Example = () => {
     const response = await fetch(croppedImage);
     const blob = await response.blob();
     const formData = new FormData();
-    formData.append('croppedImage', blob, 'image.png'); // Ensure 'croppedImage' matches the server's expected field name
+    formData.append('croppedImage', blob, 'image.jpg'); // Ensure 'croppedImage' matches the server's expected field name
     formData.append('folderName', name);
     console.log(Array.from(formData));
     try {
@@ -111,14 +179,7 @@ const Example = () => {
       fillColor: 'transparent', // Changed from '#fff' to 'transparent'
       imageSmoothingEnabled: true,
       imageSmoothingQuality: 'high',
-    }).toDataURL('image/png'));
-    // Specify the image format if it's not already PNG
-    //  if(croppedImage){
-    //   addImgtoFolder()
-    //  }
-
-
-    // console.log(croppedImage)
+    }).toDataURL('image/jpg'));
   };
 
   useEffect(() => {
@@ -170,83 +231,99 @@ const Example = () => {
   return (
     <>
       <NavBar />
-    <Container>
-      <div>
-
-        <div className="conAll">
-
-            <div className='tb'>
-              <Table hover>
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>Expression</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Image</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {detectt.map((data, key) => (
-
-                    <tr key={key}>
-                      <td>{key + 1}</td>
-                      <td>{data.expression}</td>
-                      <td>{data.date}</td>
-                      <td>{data.time}</td>
-                      <td><img width={100} height={100} style={{ borderRadius: '0.5rem' }} src={getImagePath(name,data.path)} alt="" /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-
-            </div>
-
-          <div className="conPic">
-            <button className="btnD" onClick={handleShow}>Add Image</button>
-            <Modal show={show} onHide={handleClose}>
-              <Modal.Header closeButton>
-                <Modal.Title >Upload Image</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <input className="jm" type="file" onChange={handleFileChange} />
-
-                <div className='img-container'>
-                  {image && (
-                    <Cropper
-                      src={image}
-                      className='cropper-container'
-                      initialAspectRatio={1}
-                      guides={false}
-                      crop={onCrop}
-                      ref={cropperRef}
-                    // onChange={onCrop}
-                    />
-                  )}
+      <Container>
+          <div className="conAll">
+         
+              <div className="fc">
+                <div className='size1'>
+                  <div>
+                    <h3 htmlFor="">Name: {name}</h3>
+                    <h4 >สถานะ: {detectt.status}</h4>
+                  </div>
                 </div>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                  Close
-                </Button>
-                <Button variant="primary" onClick={addImgtoFolder}>
-                  Upload Image
-                </Button>
-              </Modal.Footer>
-            </Modal>
-            <div className="">
-            <div className="d-flex overflow-auto" style={{ alignItems: 'flex-end' }} ref={scrollableRef}>
+                <div className="conPic">
+                  <button className="btnD" onClick={handleShow}>Add Image</button>
+                  <Modal show={show} onHide={handleClose}>
+                    <Modal.Header closeButton>
+                      <Modal.Title >Upload Image</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                      <input className="jm" type="file" onChange={handleFileChange} />
 
-              {picpath.map((prod, key) => {
-                return <ProductCard Name={name} pathPic={prod} />
-              })}
-            </div>
-            {isScrollVisible ? <ScrollButtons onScroll={onScroll} /> : null}
-            </div>
+                      <div className='img-container'>
+                        {image && (
+                          <Cropper
+                            src={image}
+                            className='cropper-container'
+                            initialAspectRatio={1}
+                            guides={false}
+                            crop={onCrop}
+                            ref={cropperRef}
+                          // onChange={onCrop}
+                          />
+                        )}
+                      </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button variant="secondary" onClick={handleClose}>
+                        Close
+                      </Button>
+                      <Button variant="primary" onClick={addImgtoFolder}>
+                        Upload Image
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
+          
+                    <div className="d-flex overflow-auto" style={{ alignItems: 'flex-end' }} ref={scrollableRef}>
+
+                      {picpath.map((prod, key) => {
+                        return <ProductCard Name={name} pathPic={prod} piclength={picpath.length} />
+                      })}
+                    </div>
+                    {isScrollVisible ? <ScrollButtons onScroll={onScroll} /> : null}
+               
+                </div>
+              </div>
+              <div className="sc">
+
+                <div className='size'>
+                  <div>
+                    <h3 htmlFor="">Edit name: </h3>
+                    <input
+                      type="text"
+                      placeholder="Name"
+
+                      onChange={(e) => setFolderName(e.target.value)}
+                      required />
+                  </div>
+                  <button style={{
+                    marginTop: '20px',
+                    marginBottom: '20px',
+                    border: '0.3px solid gray'
+
+                  }} onClick={changeName}>Edit</button>
+                </div>
+                <div className='size'>
+                  <div>
+                    <h4 >Change status: </h4>
+                    <select name="status" id="sta">
+                      <option value="ON">ON</option>
+                      <option value="OFF">OFF</option>
+                    </select>
+                  </div>
+                  <button style={{
+                    marginTop: '20px',
+                    marginBottom: '20px',
+                    border: '0.3px solid gray'
+
+                  }} onClick={changeStatus}>Change</button>
+                </div>
+              </div>
+          
+
+
+
           </div>
-
-        </div>
-      </div>
       </Container>
     </>
   );
@@ -258,19 +335,20 @@ const ScrollButtons = ({ onScroll }) => {
       className="d-flex align-items-center mt-5"
       style={{ cursor: "pointer" }}
     >
-      {/* <FontAwesomeIcon icon={faChevronCircleLeft} fontSize={20} onClick={() => onScroll(-50)} />
-      <FontAwesomeIcon icon={faChevronCircleRight} fontSize={20} onClick={() => onScroll(50)} />   */}
 
     </div>
   );
 };
 
-const ProductCard = ({ Name, pathPic }) => {
+const ProductCard = ({ Name, pathPic,piclength }) => {
   const getImagePath = (name, path) => {
     return import.meta.env.VITE_API + `/getImageFolder/${name}/${path}`;
   };
-  console.log(pathPic)
   const DeleteImg = async (name, path) => {
+    if(piclength===1){
+      window.alert('ต้องมีภาพอย่างน้อย 1 รูปภาพ')
+      return
+    }
     try {
       const response = await axios.delete(import.meta.env.VITE_API + `/deleteImage/${name}/${path}`);
       setPicpath(currentPaths => currentPaths.filter(p => p !== path));
@@ -287,9 +365,9 @@ const ProductCard = ({ Name, pathPic }) => {
   return (
     <div className="eleCard">
       <div className="in">
-      <img className="imgCard" style={{ borderRadius: '0.5rem' }} src={getImagePath(Name, pathPic)} alt="" />
+        <img className="imgCard" style={{ borderRadius: '0.5rem' }} src={getImagePath(Name, pathPic)} alt="" />
 
-      <button className="btnD" onClick={() => DeleteImg(Name, pathPic)}>Delete</button>
+        <button className="btnD" onClick={() => DeleteImg(Name, pathPic)}>Delete</button>
       </div>
       {/* <div>{prodDetails.description}</div> */}
     </div>

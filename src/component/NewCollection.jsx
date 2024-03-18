@@ -49,7 +49,7 @@ const NewCollection = () => {
       fillColor: 'transparent', // Changed from '#fff' to 'transparent'
       imageSmoothingEnabled: true,
       imageSmoothingQuality: 'high',
-    }).toDataURL('image/png')); // Specify the image format if it's not already PNG
+    }).toDataURL('image/jpg')); // Specify the image format if it's not already PNG
   };
 
   const handleFileChange = (event) => {
@@ -99,7 +99,7 @@ const NewCollection = () => {
     const response = await fetch(croppedImage);
     const blob = await response.blob();
     const formData = new FormData();
-    formData.append('croppedImage', blob, 'image.png'); // Ensure 'croppedImage' matches the server's expected field name
+    formData.append('croppedImage', blob, 'image.jpg'); // Ensure 'croppedImage' matches the server's expected field name
     formData.append('folderName', folderName);
     console.log(Array.from(formData));
     try {

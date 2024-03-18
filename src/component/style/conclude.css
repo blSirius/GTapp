@@ -3,13 +3,6 @@
     display: flex;
     flex-direction: column;
 }
-/* .ifcon{
-    border: 1px solid black;
-    padding: 5rem;
-    width: 20%;
-    background-color: #EBD9B4;
-} */
-
 
 .test{
     width:20%;
@@ -32,17 +25,17 @@
 .conTB{
     width: 43%;
     border: 1px solid black;
-    /* display: flex; */
 }
 .tbh{
-    /* width: 700px; */
-    /* width: auto; */
     margin-top: 2rem;
     margin-left: 2rem;
 }
-/* th{
-    table-layout: fixed;
-} */
+.modalTest{
+    width: 35%;
+}
+.modalBody{
+    width: 100%;
+}
 
 .stb{
     height: 5%;
@@ -65,17 +58,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    
     max-width: 100%;
   }
   
-  .table {
-    width: 100%; /* Fix the table width to be 100% of the container */
-    max-width: 600px; /* Max width can be adjusted to your preference */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds shadow for better visibility */
-    margin-bottom: 1rem; /* Spacing between table and pagination */
-  }
+  .tablef {
+    width: 100%; 
+    /* max-width: 600px;  */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    margin-bottom: 1rem; 
+}
   
-  /* Pagination styles */
   .pagination-container {
     display: flex;
     justify-content: center;
@@ -83,110 +76,103 @@
   }
   
   .pagination {
-    margin-top: 0; /* Ensure there is no extra space above pagination */
+    margin-top: 0; 
   }
   
-  /* Ensure that the buttons have some spacing around them */
+ 
   .pagination .page-link {
     margin: 0 4px;
   }
 
 .table-hover tbody tr:hover {
-    background-color: #f5f5f5; /* Light grey background on hover */
+    background-color: #f5f5f5; 
 }
 th, td {
-    text-align: center; /* Center align table headers and cells */
-    padding: 8px; /* Spacing inside cells */
+    text-align: center; 
+    padding: 8px;
 }
 th {
-    background-color: #4CAF50; /* Green background for headers */
-    color: white; /* White text for headers */
+    background-color: #4CAF50; 
+    color: white; 
 }
 
-/* Image Cell Styles */
+
 td img {
-    width: 100px; /* Fixed width for images */
-    height: 100px; /* Fixed height for images */
-    border-radius: 0.5rem; /* Rounded corners for images */
-    object-fit: cover; /* Ensure the images cover the area without losing aspect ratio */
+    width: 100px; 
+    height: 100px; 
+    border-radius: 0.5rem;
+    object-fit: cover;
 }
 
-/* Container Styles */
+
 .fcon {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    border: 1px solid #ccc; /* Light grey border */
-    padding: 20px; /* Spacing around flex container */
+    border: 1px solid #ccc; 
+    padding: 20px; 
 }
 
 .tt, .ifcon, .allcon, .scon, .conTB, .tbh, .stb, .ch {
     margin-top: 20px;
     margin-bottom: 20px;
-    border: 1px solid #ccc; /* Consistent light grey border */
-    padding: 15px; /* Consistent spacing inside containers */
+    border: 1px solid #ccc; 
+    padding: 15px;
 }
-
-/* Improved Background and Padding for Specific Containers */
 .ifcon, .ch {
-    background-color: #EBD9B4; /* Light brown background */
+    background-color: #EBD9B4; 
 }
 
 
 
 .ifcon {
-    border: 1px solid #ccc; /* Light grey border */
-    padding: 2rem; /* Increased padding for a larger box */
-    width: auto; /* Adjust the width as needed or use 'auto' */
+    border: 1px solid #ccc; 
+    padding: 2rem; 
+    width: auto; 
     display: flex;
-    align-items: center; /* Center items vertically */
-    justify-content: space-between; /* Space between icon and text */
-    background-color: #ECF0F1; /* Light grey background */
-    border-radius: 20px; /* More rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    margin: 0.5rem; /* Spacing around the card */
-    font-size: 1.2em; /* Larger font size */
+    align-items: center; 
+    justify-content: space-between; 
+    background-color: #ECF0F1;
+    border-radius: 20px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 0.5rem;
+    font-size: 1.2em; 
 }
 
 .ifcon .faUser {
-    font-size: 2rem; /* Larger icon size */
-    color: #7F8C8D; /* Icon color */
+    font-size: 2rem; 
+    color: #7F8C8D;
 }
-/* .faUser{
-    font-size: 36px;
-} */
 
 .ifcon:hover {
-    background-color: #D5D8DC; /* Slightly darker background on hover */
-    cursor: pointer; /* Pointer cursor on hover */
+    background-color: #D5D8DC; 
+    cursor: pointer; 
 }
 
-/* Use this class for the text inside the container */
 .ifcon-text {
-    flex-grow: 1; /* Allows text to fill the space */
-    text-align: left; /* Aligns text to the left */
-    margin-left: 1rem; /* Spacing between icon and text */
-    font-weight: bold; /* Bold text */
-    color: #34495E; /* Dark text color */
+    flex-grow: 1; 
+    text-align: left; 
+    margin-left: 1rem; 
+    font-weight: bold; 
+    color: #34495E;
 }
 
-/* Use this class for the icon container if you need additional styling */
+
 .icon-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem; /* Spacing inside the icon container */
-    color: #2ECC71; /* Color of the icon */
+    padding: 0.5rem; 
+    color: #2ECC71; 
 }
 
 
 
-/* Responsive Table */
 @media screen and (max-width: 768px) {
     .tbh, .conTB, .ch {
-        width: 100%; /* Full width on smaller screens */
+        /* width: 100%;  */
     }
     .fcon, .scon {
-        flex-direction: column; /* Stack elements vertically on smaller screens */
+        flex-direction: column; 
     }
 }

@@ -5,61 +5,74 @@ import { Button, Table, Container, Pagination } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import './style/conclude.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch, faCalendarAlt, faChartLine, faUser, faFaceSmile } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faQuestion,faLock, faChartLine, faUser, faFaceSmile } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios'
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
+import Modal from 'react-bootstrap/Modal';
 
 // Register the chart components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 export default function Conclude() {
+
+    const handleClose = () => setShow(false);
+    const [show, setShow] = useState(false);
     const [dateStart, setDateStart] = useState(null)
     const [dateStop, setDateStop] = useState(null)
     const [his, setHis] = useState([])
+    const [tableex, setTableEx] = useState([])
     const scrollRef = useRef(null);
+    const [employeeoff, setEmployeeoff] = useState([]);
     const [chartData, setChartData] = useState({
         datasets: [],
     });
+    const handleShow = async (label) => {
+        
+        try {
+            const startDate = document.getElementById('d1').value;
+            const stopDate = document.getElementById('d2').value;
+            const url = new URL(import.meta.env.VITE_API + '/getAllhistoryByDate');
+            url.searchParams.append('dateStart', startDate);
+            if (stopDate) {
+                url.searchParams.append('dateStop', stopDate);
+            }
+            url.searchParams.append('emotion', label);
+            const res = await axios.get(url.toString());
+            // console.log(res.data)
+            // Now we update the state and then immediately update the chart data
+            if (res.data) {
+                // console.log(res.data)
+                setTableEx(res.data);
+             } 
+            else {
+                setTableEx([]);
+            }
+        } catch (err) {
+            console.log('Error fetching data:', err.message);
+        }
+        setShow(true)
+    };
+    const getImagePath = (single_img) => {
+        // console.log(single_img)
+        return import.meta.env.VITE_API + `/labeled_images/${single_img}`;
+      };
     const chartOptions = {
-        scales: {
-            x: {
-                barThickness: 20, // Use this to set the thickness of the bar
-                categoryPercentage: 0.5, // Alternatively, adjust the category percentage
-                barPercentage: 0.5, // and the bar percentage
+        onClick: (event, elements, chart) => {
+            if (elements.length > 0) {
+                const index = elements[0].index;
+                const label = chart.data.labels[index];
+                handleShow(label)
+                // alert(`${label}`);
+
             }
         },
-        // Additional customization options can be added here
     };
-    const ChartData = () =>{
-        const expressionCounts = his.reduce((acc, { expression }) => {
-            acc[expression] = (acc[expression] || 0) + 1;
-            return acc;
-        }, {});
-
-        const data = {
-            labels: Object.keys(expressionCounts),
-            datasets: [
-                {
-                    label: 'Number of Expressions',
-                    data: Object.values(expressionCounts),
-                    backgroundColor: [
-                        '#FF6384',
-                        '#36A2EB',
-                        '#FFCE56',
-                        '#AEBE51',
-                        '#0EFE51',
-                        '#00FFFF',
-                        // Add more colors as needed
-                    ],
-                },
-            ],
-        };
-
-        setChartData(data);
-    
-    }
     useEffect(() => {
+        // if(his.length==0){
+        //     setHis([])
+        //     return
+        // }
         const expressionCounts = his.reduce((acc, { expression }) => {
             acc[expression] = (acc[expression] || 0) + 1;
             return acc;
@@ -69,7 +82,7 @@ export default function Conclude() {
             labels: Object.keys(expressionCounts),
             datasets: [
                 {
-                    label: 'Number of Expressions',
+                    label: 'Total Expressions',
                     data: Object.values(expressionCounts),
                     backgroundColor: [
                         '#FF6384',
@@ -86,7 +99,7 @@ export default function Conclude() {
 
         setChartData(data);
     }, [his]);
-
+    const [cunk,setCunk] = useState('0')
     useEffect(() => {
         const getAllhistory = async () => {
             try {
@@ -103,17 +116,45 @@ export default function Conclude() {
                 console.log(err);
             }
         };
+        const getEmployeeOff = async () => {
+            try {
+                const res = await axios.get(import.meta.env.VITE_API + '/getEmployeeOff');
+                setEmployeeoff(res.data.length);
+                // console.log(res.data);
+            }
+            catch (err) {
+                console.log(err);
+            }
+        }
+        const getUnknown = async () => {
+            try {
+                const res = await axios.get(import.meta.env.VITE_API + '/getUnknownDetect');
+                setCunk(res.data.length);
+                console.log(res.data.length);
+            }
+            catch (err) {
+                console.log(err);
+            }
+        }
 
         getAllhistory()
-        
- 
-    }, [dateStart, dateStop])
+        getEmployeeOff()
+        getUnknown()
+
+
+
+    }, [])
     const [employee, setEmployee] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [employeesPerPage] = useState(5);
     const indexOfLastEmployee = currentPage * employeesPerPage;
     const indexOfFirstEmployee = indexOfLastEmployee - employeesPerPage;
     const currentEmployees = employee.slice(indexOfFirstEmployee, indexOfLastEmployee);
+
+    const [currentPageEx, setCurrentPageEx] = useState(1);
+    const indexOfLastEx = currentPageEx * employeesPerPage;
+    const indexOfFirstEx = indexOfLastEx - employeesPerPage;
+    const currentEx = tableex.slice(indexOfFirstEx, indexOfLastEx);
 
     // Change page
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -132,21 +173,64 @@ export default function Conclude() {
     }, [])
     const filterbydate = async () => {
         try {
-            if (!dateStart || (!dateStop && !dateStart)) {
-                console.log('no date');
+            const startDate = document.getElementById('d1').value;
+            const stopDate = document.getElementById('d2').value;
+            if (!startDate) {
+                console.log('No start date provided');
                 return;
             }
-            // console.log(dateStart);
-            // console.log(dateStop);
+            if (startDate > stopDate && stopDate) {
+                alert('Start date cannot be greater than end date.');
+                console.log('ngo');
+                return
+            }
             const url = new URL(import.meta.env.VITE_API + '/getAllhistoryByDate');
-            url.searchParams.append('dateStart', dateStart);
-            url.searchParams.append('dateStop', dateStop); // Corrected line
+            url.searchParams.append('dateStart', startDate);
+            if (stopDate) {
+                url.searchParams.append('dateStop', stopDate);
+            }
             const res = await axios.get(url.toString());
-            console.log(res.data)
-            // setHis(res.data); // This triggers the useEffect hook that depends on `his`, which should update the chart data.
+
+            // Now we update the state and then immediately update the chart data
+            if (res.data) {
+                setHis(res.data, () => {
+                    // This callback ensures we are working with the updated state
+                    updateChartData(res.data); // We'll define this function next
+                });
+            } else {
+                setHis([]);
+            }
         } catch (err) {
-            console.log('ERROR IS', err.message);
+            console.log('Error fetching data:', err.message);
         }
+    };
+
+    const updateChartData = (historyData) => {
+        const expressionCounts = historyData.reduce((acc, { expression }) => {
+            acc[expression] = (acc[expression] || 0) + 1;
+            return acc;
+        }, {});
+
+        const newData = {
+            labels: Object.keys(expressionCounts),
+            datasets: [
+                {
+                    label: 'Number of Expressions',
+                    data: Object.values(expressionCounts),
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#AEBE51',
+                        '#0EFE51',
+                        '#00FFFF',
+                        // Add more colors as needed
+                    ],
+                },
+            ],
+        };
+
+        setChartData(newData);
     };
 
     return (
@@ -179,20 +263,20 @@ export default function Conclude() {
                         <div className="text-center mt-3">
 
                             <h3 className="fs-2 ">
-                                {employee.length}
+                                {employeeoff ? employeeoff : 0}
                             </h3>
-                            <p className="fs-5">Employee </p>
+                            <p className="fs-5">Off Status </p>
                         </div>
-                        <FontAwesomeIcon className='faUser' size='4x' icon={faUser} />
+                        <FontAwesomeIcon className='faUser' size='4x' icon={faLock} />
                     </div><div className="test p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
                         <div className="text-center mt-3">
 
                             <h3 className="fs-2 ">
-                                {employee.length}
+                            {cunk ? cunk : 0}
                             </h3>
-                            <p className="fs-5">Employee </p>
+                            <p className="fs-5">Unknown Detect</p>
                         </div>
-                        <FontAwesomeIcon className='faUser' size='4x' icon={faUser} />
+                        <FontAwesomeIcon className='faUser' size='4x' icon={faQuestion} />
                     </div>
 
                 </div>
@@ -201,7 +285,7 @@ export default function Conclude() {
 
                         <div className='conTB' >
                             <div>
-                                <Table className="table" hover>
+                                <Table className="tablef" hover>
                                     <thead>
                                         <tr>
                                             <th ></th>
@@ -241,17 +325,64 @@ export default function Conclude() {
 
                     <div className='ch'>
                         <label>Date Length:</label>
-                        <input onChange={(e) => setDateStart(e.target.value)} type='date' />
+                        <input id='d1' value={dateStart} onChange={(e) => setDateStart(e.target.value)} type='date' />
                         <label> -</label>
-                        <input onChange={(e) => setDateStop(e.target.value)} type='date' />
+                        <input id='d2' value={dateStop} onChange={(e) => setDateStop(e.target.value)} type='date' />
                         <FontAwesomeIcon onClick={filterbydate} icon={faSearch} />
                         {chartData.datasets.length > 0 && (
-                            <Bar  data={chartData}
+                            <Bar data={chartData}
                                 options={chartOptions}
                             />
+
                         )}
-                        {/* <input type='text' /> */}
+
                     </div>
+                    <Modal className='modalTest' show={show} onHide={handleClose}>
+                        <Modal.Header className='modalBody' closeButton>
+                            <Modal.Title >{/*currentEx[0].expression ? currentEx[0].expression :''*/} Expression Table</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body >
+                            <Table hover>
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Name</th>
+                                        {/* <th>Exression</th> */}
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Image</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {currentEx.map((data, key) => (
+
+                                        <tr key={key}>
+                                            <td>{key + 1}</td>
+                                            <td>{data.name}</td>
+                                            {/* <td>{data.expression}</td> */}
+                                            <td>{data.date}</td>
+                                            <td>{data.time}</td>
+                                            <td><img style={{ borderRadius: '0.5rem' }} src={getImagePath(data.path)} alt="" /></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>
+                            <div className="pagination-container">
+                                <Pagination>
+                                    {[...Array(Math.ceil(tableex.length / employeesPerPage)).keys()].map(number => (
+                                        <Pagination.Item key={number + 1} active={number + 1 === currentPageEx} onClick={() => paginate(number + 1)}>
+                                            {number + 1}
+                                        </Pagination.Item>
+                                    ))}
+                                </Pagination>
+                            </div>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={handleClose}>
+                                Close
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
                 </div>
 
 

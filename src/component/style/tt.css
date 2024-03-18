@@ -6,7 +6,7 @@
         width: 100%;
     }
     .conAll{
-        /* display: flex; */
+        display: flex;
         /* justify-content: center; */
         flex-direction: column;
         align-items: center;
@@ -25,6 +25,19 @@
 
   body{
     background-color: #F9EFDB;
+  }
+
+  .sc{
+    width: 50%;
+
+  }
+  .fc{
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    /* align-items: center; */
+    justify-content: space-around;
+    
   }
 .eleCard{
     background-color: #E5C287;
@@ -55,19 +68,20 @@
     margin-top: 1rem;
     padding: 0.5rem;
     display: flex;
+    align-items: center;
     /* flex-wrap: wrap ; */
-    justify-content: space-around;
+    /* justify-content: space-around; */
 }
 
 .conPic{
     background-color: #EBD9B4;
-     display: inline-flex; 
+     /* display: inline-flex;  */
      flex-direction: column; 
     border: 1px outset black;
     border-radius: 25px;
     padding: 1rem;
-    max-width: 100%;
-    width: 40%;
+    max-width: 70%;
+    /* width: 50%; */
     /* width: 40%; */
 }
 
@@ -117,7 +131,6 @@ button {
     background-color: #0056b3;
 }
 
-/* Modal styling */
 .modal-container {
     position: fixed;
     left: 0;
@@ -128,7 +141,7 @@ button {
     align-items: center;
     justify-content: center;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000; /* Ensure modal is above other content */
+    z-index: 1000; 
 }
 
 .modal {
@@ -136,12 +149,11 @@ button {
     padding: 2rem;
     background-color: white;
     width: 30em;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds shadow for depth */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Buttons in the modal footer */
 .modal-footer button {
-    margin: 0 0.5rem; /* Adds space between buttons */
+    margin: 0 0.5rem; 
 }
 
 .btn-secondary {
@@ -153,7 +165,6 @@ button {
     background-color: #545b62;
 }
 
-/* Submit and Cancel buttons */
 .btn-submit {
     background-color: #28a745;
     color: white;
@@ -172,7 +183,7 @@ button {
     background-color: #c82333;
 }
 
-/* Close button styling */
+
 .close {
     cursor: pointer;
     background: transparent;
@@ -181,29 +192,26 @@ button {
     color: #000;
 }
 
-/* Style for modal header and content */
 .modal-header {
     display: flex;
-    justify-content: space-between; /* Adjusts alignment of header items */
+    justify-content: space-between;
     padding-bottom: 1rem;
-    border-bottom: 1px solid #e9ecef; /* Adds a separator */
+    border-bottom: 1px solid #e9ecef; 
 }
 
 .modal-content {
     margin-bottom: 2rem;
-    padding: 1rem; /* Adds padding around content for whitespace */
+    padding: 1rem; 
 }
 
-/* Image container */
 .NewCollectionCSS-img-container {
     width: 100%;
-    text-align: center; /* Centers the cropper container */
+    /* text-align: center;  */
 }
 
-/* Cropped image display styles */
 .croppedImage {
     display: block;
-    width: auto; /* Adjust as necessary for your layout */
+    width: auto; 
     height: auto;
     margin: 20px auto;
     border: 1px solid #ddd;
@@ -211,7 +219,7 @@ button {
     border-radius: 4px;
 }
 
-/* Upload button */
+
 button[onclick="handleUpload"] {
     background-color: #17a2b8;
     color: white;
@@ -223,29 +231,30 @@ button[onclick="handleUpload"]:hover {
     background-color: #138496;
 }
 
-/* Ensures that the button text is not selectable for a better user experience */
+
 button {
     user-select: none;
 }
 
-/* Clear floats */
+
 .clearfix::after {
     content: "";
     display: table;
     clear: both;
 }
 
-.all{
+/* .all{
   display: flex;
+  align-items: center;
   justify-content: center;
   
 
-}
+} */
 
 .size{
   border: #000 solid 1px;
   align-items: center;
-  margin-top: 5rem;
+  /* margin-top: 5rem; */
   padding-top: 2rem;
   padding-bottom: 2rem;
   padding-left: 7rem;
@@ -253,6 +262,19 @@ button {
   border-radius: 25px;
   background-color: rgba(241, 242, 234, 0.893);
 }
+.size1{
+    border: #000 solid 1px;
+    /* align-items: center; */
+    /* margin-top: 5rem; */
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    padding-left: 7rem;
+    padding-right: 7rem;
+    border-radius: 25px;
+    background-color: rgba(241, 242, 234, 0.893);
+    max-width: 100%;
+    width: 70%;
+  }
 .btn{
   margin-right: 0.5rem;
 }
