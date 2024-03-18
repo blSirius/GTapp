@@ -5,7 +5,7 @@ import './style/testSearchPicStyles.css';
 import * as faceapi from 'face-api.js';
 import { Container, InputGroup, Form, Button, Table } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch, faMagnifyingGlass,faQuestion,faLock, faChartLine, faUser, faFaceSmile } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faMagnifyingGlass, faQuestion, faLock, faChartLine, faUser, faFaceSmile } from '@fortawesome/free-solid-svg-icons'
 export default function TestSearchPic() {
 
   const imageUploadRef = useRef();
@@ -14,8 +14,9 @@ export default function TestSearchPic() {
   const [loading, setLoading] = useState(false);
   const [picpng, setpicPNG] = useState(null);
   const [data, setData] = useState([])
-  const [namefile, setNameFile] = useState(null)
-  const [noface,setNoFace] = useState(null)
+  const [namefile, setNameFile] = useState([])
+  // const [noface,setNoFace] = useState(null)
+  const [copyname, setCopyname] = useState([])
   useEffect(() => {
     const MODEL_URL = '/models';
     setLoading(true);
@@ -29,9 +30,9 @@ export default function TestSearchPic() {
       // setLabels(labelsData.data);
       const labeledFaceDescriptors = await loadLabeledImage(labelsData.data);
       // console.log(labeledFaceDescriptors)
-    
+
       const matcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.59);
-      console.log(matcher)
+      // console.log(matcher)
       setFaceMatcher(matcher);
 
       setLoading(false);
@@ -69,6 +70,9 @@ export default function TestSearchPic() {
     const pngFiles = matches
       .filter(match => match.file && match.file.endsWith('.png' || '.jpg')) // Ensure the file ends with .png
       .map(match => {
+        // namefile.push(match.file)
+        setNameFile(previousNames => [...previousNames, match.file]);
+        // console.log('WHYYYYYY' + match.file)
         // Extract just the filename from the URL path
         const filename = match.file.split('/').pop(); // Assuming match.file is a string with the file path
         return filename;
@@ -94,7 +98,7 @@ export default function TestSearchPic() {
         const { label } = labelInfo;
         const res = await axios.get(import.meta.env.VITE_API + `/getFilePic/${label}`);
         const fileNames = res.data;
-  
+
         const descriptions = [];
         for (const fileName of fileNames) {
           const img = await faceapi.fetchImage(import.meta.env.VITE_API + `/getImageFolder/${encodeURIComponent(label)}/${fileName}`);
@@ -117,57 +121,41 @@ export default function TestSearchPic() {
     ).then(labeledDescriptors => labeledDescriptors.filter(ld => ld)); // Filter out any nulls
   };
 
-  // const loadLabeledImagess = (labelsInfo) => {
-  //   return Promise.all(
-  //     labelsInfo.map(async labelInfo => {
-  //       const { label, imageCount } = labelInfo;
-  //       // console.log(label)
-  //       const res = await axios.get(import.meta.env.VITE_API + `/getFilePic/${label}`);
-  //       // console.log(res)
-  //       const descriptions = [];
-  //       for (let i = 1; i <= imageCount; i++) {
-  //         const img = await faceapi.fetchImage(import.meta.env.VITE_API + `/getImageFolder/${encodeURIComponent(label)}/${i}.png`);
-  //         // console.log(img)
-  //         // console.log(import.meta.env.VITE_API + `/images/${encodeURIComponent(label)}/${i}.png`)
-  //         const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
-  //         descriptions.push(detections.descriptor);
-  //         console.log(descriptions)
-  //       }
-  //       return new faceapi.LabeledFaceDescriptors(label, descriptions);
-  //     })
-
-  //   );
-  // };
-
-
-  // const loadLabeledImages = (labelsInfo) => {
-  //   return Promise.all(
-  //     labelsInfo.map(async labelInfo => {
-  //       const { label, imageCount } = labelInfo;
-  //       // console.log(label)
-  //       const res = await axios.get(import.meta.env.VITE_API + `/getFilePic/${label}`);
-  //       const fileNames = res.data;
-
-  //       // console.log(res)
-  //       const descriptions = [];
-  //       for (const fileName of fileNames) {
+  const filterbydate = async () => {
+    try {
+        const startDate = document.getElementById('d1').value;
+        const stopDate = document.getElementById('d2').value;
+        if (!startDate) {
+            console.log('No start date provided');
+            return;
+        }
+        if (startDate > stopDate && stopDate) {
+            alert('Start date cannot be greater than end date.');
+            console.log('ngo');
+            return
+        }
+        // console.log(startDate)
+        setData([])
+     
+          const url = new URL(import.meta.env.VITE_API + `/getEmpDetect/${namefile}`);
+          url.searchParams.append('dateStart', startDate);
+          if (stopDate) {
+              url.searchParams.append('dateStop', stopDate);
+          }
           
-  //         const img = await faceapi.fetchImage(import.meta.env.VITE_API + `/getImageFolder/${encodeURIComponent(label)}/${fileName}`);
-  //         // console.log(img)
-  //         const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
-  //         descriptions.push(detections.descriptor);
-  //         console.log(descriptions)
-
-  //       }
-  //       return new faceapi.LabeledFaceDescriptors(label, descriptions);
-  //     })
-
-  //   );
-  // };
+          const res = await axios.get(url.toString());
+          setData(res.data)
+          // console.log(res.data)
+        
+        // console.log(data)
+    } catch (err) {
+        console.log('Error fetching data:', err.message);
+    }
+};
 
   const handleImageUpload = async event => {
     if (event.target.files && event.target.files.length > 0 && faceMatcher) {
-      setNameFile(null)
+      // setNameFile(null)
       setData([])
       setpicPNG(null)
       const imgFile = event.target.files[0];
@@ -188,12 +176,12 @@ export default function TestSearchPic() {
       const detections = await faceapi.detectAllFaces(img)
         .withFaceLandmarks()
         .withFaceDescriptors();
-      if(detections.length===0){
+      if (detections.length === 0) {
         window.alert('No face detected in the image. Please upload an image with a face.');
         return;
       }
       if (detections.length > 0) {
-        setNoFace(true)
+        // setNoFace(true)
         const resizedDetections = faceapi.resizeResults(detections, {
           width: canvas.width,
           height: canvas.height,
@@ -207,6 +195,8 @@ export default function TestSearchPic() {
             if (imageFromDetected) {
               console.log('Unknown Matched Image:', imageFromDetected);
               setpicPNG(imageFromDetected)
+              console.log(imageFromDetected)
+              // setNameFile(previousNames => [...previousNames, imageFromDetected.toString()]);
               saveMatchedName(imageFromDetected);
             } else {
               console.log('not found')
@@ -214,9 +204,11 @@ export default function TestSearchPic() {
 
           } else {
             console.log('Known Face Matched:', bestMatch.toString());
-            setNameFile(bestMatch)
+            namefile.push(bestMatch.toString())
+            // setNameFile(bestMatch)
             saveMatchedName([bestMatch]);
           }
+          // console.log('NFNFNNFNF'+namefile)
           const box = detection.detection.box;
           const drawBox = new faceapi.draw.DrawBox(box, { label: bestMatch.toString() });
           drawBox.draw(canvas);
@@ -224,15 +216,18 @@ export default function TestSearchPic() {
       }
     }
     // {data.map((item, key) => (
-    //   console.log(item.name)
-    //  )))}
-
+    //   console.log('testttttt'+item.name)
+    //  ))}
+    //  console.log('ttttttttt'+data)
+    console.log("saddsadassaddsasdaas" + namefile)
   };
   const saveMatchedName = (matches) => {
     const getDetect = async () => {
       try {
         let fetchPromises = [];
         for (const match of matches) {
+          // console.log('Match is'+match)
+          // setCopyname(prevData => [...prevData, ...match]);
           const name = match.toString().split(' ')[0];
           fetchPromises.push(axios.get(import.meta.env.VITE_API + `/getEmpDetect/${name}`));
         }
@@ -245,18 +240,22 @@ export default function TestSearchPic() {
         }, []);
 
         // Combine new data with existing state data
+        // setCopyname(prevData => [...prevData, ...newCombinedData.path]);
         setData(prevData => [...prevData, ...newCombinedData]);
-        console.log('Data set in state:', newCombinedData);
-
+        // console.log('Data set in state:', newCombinedData);
+        // console.log("COPY IS "+copyname)
       } catch (err) {
         console.error('Error fetching data:', err);
       }
     };
 
     getDetect();
-    
-  };
+    // console.log(copyname)
 
+  };
+  const check = () => {
+    console.log(namefile)
+  }
 
   return (
     <>
@@ -278,13 +277,13 @@ export default function TestSearchPic() {
         </div>
         <div className="contentContainer">
           <canvas ref={canvasRef} className="testSearchPicCanvas" />
-          {namefile || picpng ? (
+          {picpng||1 ? (
             <div className="tableContainer">
-               <label>Date Length:</label>
-                        <input id='d1' type='date' />
+              <label>Date Length:</label>
+              <input id='d1' type='date' />
                         <label> -</label>
-                        <input id='d2' type='date' />
-                            <Button    style={{ width: '10%', marginLeft: '1rem' }}> <FontAwesomeIcon icon={faSearch} /></Button>
+                        <input id='d2'  type='date' />
+              <Button onClick={filterbydate} style={{ width: '10%', marginLeft: '1rem' }}> <FontAwesomeIcon icon={faSearch} /></Button>
               <Table style={{ marginTop: '3rem' }} hover>
                 <thead >
                   <tr>

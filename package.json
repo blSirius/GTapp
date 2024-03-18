@@ -33,6 +33,7 @@
     "react-image-crop": "^11.0.5",
     "react-native-modal": "^13.0.1",
     "react-router-dom": "^6.21.1",
+    "react-toastify": "^10.0.5",
     "styles": "^0.2.1"
   },
   "devDependencies": {

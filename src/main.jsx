@@ -26,6 +26,7 @@ import Modall from './component/ModalTest/Modal.jsx';
 // import Md from './component/ModalTest/Md.jsx';
 import Example from './component/tt.jsx';
 import Conclude from './component/Conclude.jsx';
+import Greeting from './component/Greeting.jsx';
 
 //create router
 const router = createBrowserRouter([
@@ -88,6 +89,10 @@ const router = createBrowserRouter([
   {
     path: '/history/:name',
     element: <Search/>
+  },
+  {
+    path: '/greeting/',
+    element: <Greeting/>
   },
 
 
