@@ -4,6 +4,8 @@ import axios from 'axios';
 import './style/testSearchPicStyles.css';
 import * as faceapi from 'face-api.js';
 import { Container, InputGroup, Form, Button, Table } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSearch, faMagnifyingGlass,faQuestion,faLock, faChartLine, faUser, faFaceSmile } from '@fortawesome/free-solid-svg-icons'
 export default function TestSearchPic() {
 
   const imageUploadRef = useRef();
@@ -221,7 +223,9 @@ export default function TestSearchPic() {
         });
       }
     }
-
+    // {data.map((item, key) => (
+    //   console.log(item.name)
+    //  )))}
 
   };
   const saveMatchedName = (matches) => {
@@ -250,6 +254,7 @@ export default function TestSearchPic() {
     };
 
     getDetect();
+    
   };
 
 
@@ -275,7 +280,11 @@ export default function TestSearchPic() {
           <canvas ref={canvasRef} className="testSearchPicCanvas" />
           {namefile || picpng ? (
             <div className="tableContainer">
-              <input type='date' />
+               <label>Date Length:</label>
+                        <input id='d1' type='date' />
+                        <label> -</label>
+                        <input id='d2' type='date' />
+                            <Button    style={{ width: '10%', marginLeft: '1rem' }}> <FontAwesomeIcon icon={faSearch} /></Button>
               <Table style={{ marginTop: '3rem' }} hover>
                 <thead >
                   <tr>

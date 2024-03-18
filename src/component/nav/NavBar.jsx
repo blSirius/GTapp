@@ -59,7 +59,7 @@ function NavBar() {
   return (
     <nav>
       <Link to="/home" className="title">
-        Website
+        Greeting System
       </Link>
       <div className="menu" onClick={() => setMenuOpen(!menuOpen)}>
         <span></span>

@@ -5,7 +5,7 @@ import { Button, Table, Container, Pagination } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import './style/conclude.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch, faQuestion,faLock, faChartLine, faUser, faFaceSmile } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faMagnifyingGlass,faQuestion,faLock, faChartLine, faUser, faFaceSmile } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios'
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
@@ -15,7 +15,7 @@ import Modal from 'react-bootstrap/Modal';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 export default function Conclude() {
-
+    const [yester,setYester] = useState(false)
     const handleClose = () => setShow(false);
     const [show, setShow] = useState(false);
     const [dateStart, setDateStart] = useState(null)
@@ -27,6 +27,25 @@ export default function Conclude() {
     const [chartData, setChartData] = useState({
         datasets: [],
     });
+
+    const searchOnData = async () => {
+        let nameOn = document.getElementById('on').value
+
+
+        try {
+            const url = new URL(import.meta.env.VITE_API + '/getEmployee');
+            url.searchParams.append('name', nameOn);
+            const res = await axios.get(url.toString());
+            setEmployee(res.data);
+            // console.log(res.data);
+        }
+        catch (err) {
+            console.log(err);
+        }
+
+    }
+
+
     const handleShow = async (label) => {
         
         try {
@@ -263,7 +282,7 @@ export default function Conclude() {
                         <div className="text-center mt-3">
 
                             <h3 className="fs-2 ">
-                                {employeeoff ? employeeoff : 0}
+                                {employeeoff ? employeeoff : '0'}
                             </h3>
                             <p className="fs-5">Off Status </p>
                         </div>
@@ -285,6 +304,10 @@ export default function Conclude() {
 
                         <div className='conTB' >
                             <div>
+                            <div className='inin'>
+                                <input id='on' placeholder='Search' style={{ width: '70%'}} type='text' />
+                                <Button style={{ width: '10%', margin: '1rem' }} onClick={searchOnData} ><FontAwesomeIcon  icon={faMagnifyingGlass} /> </Button>
+                            </div>
                                 <Table className="tablef" hover>
                                     <thead>
                                         <tr>
@@ -328,7 +351,7 @@ export default function Conclude() {
                         <input id='d1' value={dateStart} onChange={(e) => setDateStart(e.target.value)} type='date' />
                         <label> -</label>
                         <input id='d2' value={dateStop} onChange={(e) => setDateStop(e.target.value)} type='date' />
-                        <FontAwesomeIcon onClick={filterbydate} icon={faSearch} />
+                            <Button   onClick={filterbydate} style={{ width: '10%', marginLeft: '1rem' }}> <FontAwesomeIcon icon={faSearch} /></Button>
                         {chartData.datasets.length > 0 && (
                             <Bar data={chartData}
                                 options={chartOptions}
@@ -342,6 +365,7 @@ export default function Conclude() {
                             <Modal.Title >{/*currentEx[0].expression ? currentEx[0].expression :''*/} Expression Table</Modal.Title>
                         </Modal.Header>
                         <Modal.Body >
+                        
                             <Table hover>
                                 <thead>
                                     <tr>

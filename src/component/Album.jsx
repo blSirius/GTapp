@@ -4,7 +4,7 @@ import { Container, Pagination, InputGroup, Form, Button, Table } from 'react-bo
 import AlbumCSS from './style/Album.module.css'
 import axios from 'axios'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck, faEye, faPen, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faLockOpen, faCheck, faMagnifyingGlass, faPen, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 
 
 function Album() {
@@ -29,7 +29,7 @@ function Album() {
             try {
                 const res = await axios.get(import.meta.env.VITE_API + '/getEmployee');
                 setEmployee(res.data);
-                // console.log(res.data);
+                console.log(res.data);
             }
             catch (err) {
                 console.log(err);
@@ -48,53 +48,63 @@ function Album() {
         }
         getEmployee();
         getEmployeeOff();
-    }, [employee])
-    const [employeeStatuses, setEmployeeStatuses] = useState(() =>
-        currentEmployeesOff.reduce((acc, employee) => {
-            acc[employee.employee_id] = employee.status; // Assuming each employee has a unique employee_id
-            return acc;
-        }, {})
-    );
-    const changeStatus = async (employee) => {
-        const statusSelect = document.querySelector(`#status-${employee.employee_id}`);
-        const newStatus = statusSelect.value;
-
-        if (newStatus === 'ON') {
-            if (window.confirm('Are you sure you want to change the status back to ON?')) {
-                try {
-                    const res = await axios.post(import.meta.env.VITE_API + '/changeStatus', {
-                        folderName: employee.employee_name,
-                        status: newStatus,
-                    });
-                    console.log(res.data);
-
-                    // Assuming you want to navigate somewhere after status change
-                    // navigate('/album'); 
-                } catch (error) {
-                    console.error('Error changing status:', error);
-                }
-                try {
-                    const response = await axios.post(import.meta.env.VITE_API + '/updateStatusDB', { folderName: employee.employee_name, status: 'ON' });
-                    console.log(response.data);
-                    navigate('/album')
-                    // Handle any additional UI updates or notifications here
-                  } catch (error) {
-                    console.error('Error renaming folder:', error);
-                    // Handle displaying the error to the user here
-                  }
-            } else {
-                // If the user cancels the confirmation, revert the select to 'OFF'
-                statusSelect.value = 'OFF';
-            }
-        } else {
-            // Handle the 'OFF' case as needed
+    }, [])
+    const searchOnData = async () => {
+        let nameOn = document.getElementById('on').value
+        try {
+            const url = new URL(import.meta.env.VITE_API + '/getEmployee');
+            url.searchParams.append('name', nameOn);
+            const res = await axios.get(url.toString());
+            setEmployee(res.data);
+            // console.log(res.data);
+        }
+        catch (err) {
+            console.log(err);
         }
 
-        // Update the employeeStatuses state to reflect the new status
-        setEmployeeStatuses((prevStatuses) => ({
-            ...prevStatuses,
-            [employee.employee_id]: newStatus,
-        }));
+    }
+    const searchOffData = async () => {
+        let nameOn = document.getElementById('off').value
+
+
+        try {
+            const url = new URL(import.meta.env.VITE_API + '/getEmployeeOff');
+            url.searchParams.append('name', nameOn);
+            const res = await axios.get(url.toString());
+            setEmployeeoff(res.data);
+            // console.log(res.data);
+        }
+        catch (err) {
+            console.log(err);
+        }
+
+    }
+    const changeStatus = async (employee) => {
+        if (window.confirm('Are you sure you want to change the status back to ON?')) {
+            try {
+                const res = await axios.post(import.meta.env.VITE_API + '/changeStatus', {
+                    folderName: employee.employee_name,
+                    status: 'ON',
+                });
+                console.log(res.data);
+
+                // Assuming you want to navigate somewhere after status change
+                // navigate('/album'); 
+            } catch (error) {
+                console.error('Error changing status:', error);
+            }
+            try {
+                const response = await axios.post(import.meta.env.VITE_API + '/updateStatusDB', { folderName: employee.employee_name, status: 'ON' });
+                console.log(response.data);
+                navigate('/album')
+                // Handle any additional UI updates or notifications here
+            } catch (error) {
+                console.error('Error renaming folder:', error);
+                // Handle displaying the error to the user here
+            }
+            navigate('/album')
+        }
+
     };
 
     return (
@@ -108,6 +118,12 @@ function Album() {
                 <div className={AlbumCSS.bigcontainer}>
                     {employee ? (
                         <div className={AlbumCSS.tb1container}>
+                            <div className='inin'>
+                                <input id='on' placeholder='Search' style={{ width: '70%' }} type='text' />
+                                <Button style={{ width: '10%', margin: '1rem' }} ><FontAwesomeIcon onClick={searchOnData} icon={faMagnifyingGlass} /> </Button>
+                            </div>
+
+
                             <Table hover>
                                 <thead>
                                     <tr>
@@ -145,14 +161,18 @@ function Album() {
 
                         </div>
                     ) : ''}
-                    {employee ? (
+                    {employeeoff ? (
                         <div className={AlbumCSS.tb1container}>
+                            <div className='inin'>
+                                <input id='off' placeholder='Search' style={{ width: '70%' }} type='text' />
+                                <Button style={{ width: '10%', margin: '1rem' }} ><FontAwesomeIcon onClick={searchOffData} icon={faMagnifyingGlass} /> </Button>
+                            </div>
                             <Table hover>
                                 <thead>
                                     <tr>
                                         <th ></th>
                                         <th>Name</th>
-                                        <th colSpan={3}>Actions</th>
+                                        <th colSpan={2}>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -160,20 +180,14 @@ function Album() {
                                         <tr key={key}>
                                             <td>{indexOfFirstEmployeeOff + key + 1}</td>
                                             <td>{data.employee_name}</td>
-                                            <td style={{ textAlign: 'center' }}>
-                                                <select name="status" id={`status-${data.employee_id}`} value={employeeStatuses[data.employee_id]} onChange={() => changeStatus(data)}>
-                                                    <option value="OFF">off</option>
-                                                    <option value="ON">on</option>
-                                                </select>
+                                            <td>
+                                                <Button onClick={() => changeStatus(data, data.employee_name)} style={{ backgroundColor: 'green', width: '80%' }}>
+                                                    <FontAwesomeIcon icon={faLockOpen} />
+                                                </Button>
                                             </td>
-                                            {employeeStatuses[data.employee_id] === 'ON' && (
-                                                <td style={{ textAlign: 'center' }}>
-                                                    <Button onClick={() => changeStatus(data, data.employee_name)} style={{ backgroundColor: 'green', width: '80%' }}>
-                                                        <FontAwesomeIcon icon={faCheck} />
-                                                    </Button>
-                                                </td>
-                                            )}
+
                                             <td style={{ textAlign: 'center' }}>
+
                                                 <Button href={`/tt/${data.employee_name}`} variant='success' style={{ backgroundColor: 'red', width: '80%' }}>
                                                     <FontAwesomeIcon icon={faTrash} />
                                                 </Button>
@@ -195,7 +209,7 @@ function Album() {
 
 
                         </div>
-                    ) : ''}
+                    ) : 'No status OFF'}
 
 
                 </div>

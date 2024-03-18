@@ -6,6 +6,14 @@ body {
   
   .tb1container{
     width: 50%;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    /* align-items: center; */
+    margin: 2rem;
+  }
+  .inin{
+    margin: 1em;
   }
   .newCollectionBtn {
     display: flex;
@@ -13,7 +21,10 @@ body {
     padding: 1rem;
   }
   .bigcontainer{
-    display: flex;
+    
+    display: flex; 
+    flex-direction: row;
+    justify-content: space-between;
   }
   
   .newCollectionBtn button {
