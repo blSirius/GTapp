@@ -11,11 +11,9 @@ import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 import Modal from 'react-bootstrap/Modal';
 
-// Register the chart components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 export default function Conclude() {
-    const [yester,setYester] = useState(false)
     const handleClose = () => setShow(false);
     const [show, setShow] = useState(false);
     const [dateStart, setDateStart] = useState(null)
@@ -30,8 +28,6 @@ export default function Conclude() {
 
     const searchOnData = async () => {
         let nameOn = document.getElementById('on').value
-
-
         try {
             const url = new URL(import.meta.env.VITE_API + '/getEmployee');
             url.searchParams.append('name', nameOn);
@@ -42,10 +38,7 @@ export default function Conclude() {
         catch (err) {
             console.log(err);
         }
-
     }
-
-
     const handleShow = async (label) => {
         
         try {
@@ -59,7 +52,6 @@ export default function Conclude() {
             url.searchParams.append('emotion', label);
             const res = await axios.get(url.toString());
             // console.log(res.data)
-            // Now we update the state and then immediately update the chart data
             if (res.data) {
                 // console.log(res.data)
                 setTableEx(res.data);
@@ -73,7 +65,6 @@ export default function Conclude() {
         setShow(true)
     };
     const getImagePath = (single_img) => {
-        // console.log(single_img)
         return import.meta.env.VITE_API + `/labeled_images/${single_img}`;
       };
     const chartOptions = {
@@ -82,16 +73,10 @@ export default function Conclude() {
                 const index = elements[0].index;
                 const label = chart.data.labels[index];
                 handleShow(label)
-                // alert(`${label}`);
-
             }
         },
     };
     useEffect(() => {
-        // if(his.length==0){
-        //     setHis([])
-        //     return
-        // }
         const expressionCounts = his.reduce((acc, { expression }) => {
             acc[expression] = (acc[expression] || 0) + 1;
             return acc;
@@ -122,29 +107,24 @@ export default function Conclude() {
     useEffect(() => {
         const getAllhistory = async () => {
             try {
-                // Constructing the URL with query parameters
                 const url = new URL(import.meta.env.VITE_API + '/getAllhistory');
-                // console.log(dateStart)
-                // if (dateStart) url.searchParams.append('dateStart', dateStart);
-                // if (dateStop) url.searchParams.append('dateStop', dateStop);
-
                 const res = await axios.get(url.toString());
                 setHis(res.data);
-                // console.log(res.data);
             } catch (err) {
                 console.log(err);
             }
         };
+        // for count Emp off
         const getEmployeeOff = async () => {
             try {
                 const res = await axios.get(import.meta.env.VITE_API + '/getEmployeeOff');
                 setEmployeeoff(res.data.length);
-                // console.log(res.data);
             }
             catch (err) {
                 console.log(err);
             }
         }
+        //for count unknown
         const getUnknown = async () => {
             try {
                 const res = await axios.get(import.meta.env.VITE_API + '/getUnknownDetect');
@@ -155,13 +135,9 @@ export default function Conclude() {
                 console.log(err);
             }
         }
-
         getAllhistory()
         getEmployeeOff()
         getUnknown()
-
-
-
     }, [])
     const [employee, setEmployee] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -176,13 +152,13 @@ export default function Conclude() {
     const currentEx = tableex.slice(indexOfFirstEx, indexOfLastEx);
 
     // Change page
+    const paginateEx = (pageNumber) => setCurrentPageEx(pageNumber);
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
     useState(() => {
         const getEmployee = async () => {
             try {
                 const res = await axios.get(import.meta.env.VITE_API + '/getEmployee');
                 setEmployee(res.data);
-                // console.log(res.data);
             }
             catch (err) {
                 console.log(err);
@@ -209,12 +185,9 @@ export default function Conclude() {
                 url.searchParams.append('dateStop', stopDate);
             }
             const res = await axios.get(url.toString());
-
-            // Now we update the state and then immediately update the chart data
             if (res.data) {
                 setHis(res.data, () => {
-                    // This callback ensures we are working with the updated state
-                    updateChartData(res.data); // We'll define this function next
+                    updateChartData(res.data);
                 });
             } else {
                 setHis([]);
@@ -394,7 +367,7 @@ export default function Conclude() {
                             <div className="pagination-container">
                                 <Pagination>
                                     {[...Array(Math.ceil(tableex.length / employeesPerPage)).keys()].map(number => (
-                                        <Pagination.Item key={number + 1} active={number + 1 === currentPageEx} onClick={() => paginate(number + 1)}>
+                                        <Pagination.Item key={number + 1} active={number + 1 === currentPageEx} onClick={() => paginateEx(number + 1)}>
                                             {number + 1}
                                         </Pagination.Item>
                                     ))}
@@ -408,9 +381,6 @@ export default function Conclude() {
                         </Modal.Footer>
                     </Modal>
                 </div>
-
-
-
             </div>
         </div>
     )

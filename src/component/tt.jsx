@@ -4,7 +4,8 @@ import { Button, Table, Container } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
-import './style/tt.css'
+// import './style/tt.css'
+import EditEmpCSS from './style/tt.module.css'
 import Cropper from 'react-cropper';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -19,20 +20,18 @@ const Example = () => {
   const [folderName, setFolderName] = useState(null)
   const [status, setStatus] = useState('on')
   const [alllabelname, setAlllabelname] = useState([])
-  const [detectt, setDetect] = useState([])
+  const [Emp, setEmp] = useState([])
   useEffect(() => {
-    const getDetect = async () => {
+    const getEmpDetail = async () => {
       try {
         const res = await axios.get(import.meta.env.VITE_API + `/getEmployeeDetail/${name}`);
         console.log(res)
-
-        setDetect(res.data);
-
+        setEmp(res.data)
       } catch (err) {
         console.error('Error fetching data:', err);
       }
     };
-    getDetect()
+    getEmpDetail()
   }, []);
 
   useState(() => {
@@ -55,7 +54,6 @@ const Example = () => {
   const scrollableRef = useRef(null);
   const [isScrollVisible, setIsScrollVisible] = useState(false);
   const [croppedImage, setCroppedImage] = useState(null);
-  const [data, setData] = useState([])
   const [picpath, setPicpath] = useState([])
   const [show, setShow] = useState(false);
   const [image, setImage] = useState(null);
@@ -83,24 +81,20 @@ const Example = () => {
       window.alert('กรุณาใส่ชื่อ');
       return;
     }
-    const oldFolderName = name; // You need to get this from somewhere, e.g., state or props
-    const newFolderName = folderName; // The new folder name from the state
+    const oldFolderName = name; 
+    const newFolderName = folderName;
 
     try {
       const response = await axios.post(import.meta.env.VITE_API + '/renameFolder', { oldName: oldFolderName, newName: newFolderName });
       console.log(response.data);
-      // Handle any additional UI updates or notifications here
     } catch (error) {
       console.error('Error renaming folder:', error);
-      // Handle displaying the error to the user here
     }
     try {
       const response = await axios.post(import.meta.env.VITE_API + '/updateEmployeeName', { oldName: oldFolderName, newName: newFolderName });
       console.log(response.data);
-      // Handle any additional UI updates or notifications here
     } catch (error) {
       console.error('Error renaming folder:', error);
-      // Handle displaying the error to the user here
     }
     navigate('/album')
   }
@@ -117,15 +111,12 @@ const Example = () => {
     try {
       const response = await axios.post(import.meta.env.VITE_API + '/updateStatusDB', { folderName: name, status: status });
       console.log(response.data);
-      // Handle any additional UI updates or notifications here
     } catch (error) {
       console.error('Error renaming folder:', error);
-      // Handle displaying the error to the user here
     }
     navigate('/album')
   };
   const addImgtoFolder = async () => {
-
     const imageElement = cropperRef.current;
     const cropper = imageElement?.cropper;
     const croppedCanvas = cropper.getCroppedCanvas();
@@ -188,12 +179,10 @@ const Example = () => {
     Promise.all([
       faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
     ])
-    // const imgShow =  loadLabeledImages(name);
     const getPic = async () => {
       try {
         const res = await axios.get(import.meta.env.VITE_API + `/getFilePic/${name}`);
         if (Array.isArray(res.data)) {
-          // console.log(res.data)
           setPicpath(res.data);
         } else {
           console.error('Data received is not an array:', res.data);
@@ -205,10 +194,6 @@ const Example = () => {
     getPic()
 
   }, []);
-
-  //show the scroll button if our main container is smaller than our content width
-  //Basically when our scroll bar is shown in overflow auto
-
 
   const checkScroll = () => {
     if (
@@ -232,24 +217,23 @@ const Example = () => {
     <>
       <NavBar />
       <Container>
-          <div className="conAll">
+          <div className={EditEmpCSS.conAll}>
          
-              <div className="fc">
-                <div className='size1'>
+              <div className={EditEmpCSS.fc}>
+                <div className={EditEmpCSS.size1}>
                   <div>
                     <h3 htmlFor="">Name: {name}</h3>
-                    <h4 >สถานะ: {detectt.status}</h4>
+                    <h4 >สถานะ: {Emp.status}</h4>
                   </div>
                 </div>
-                <div className="conPic">
-                  <button className="btnD" onClick={handleShow}>Add Image</button>
+                <div className={EditEmpCSS.conPic}>
+                  <button className={EditEmpCSS.btnD} onClick={handleShow}>Add Image</button>
                   <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
                       <Modal.Title >Upload Image</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                      <input className="jm" type="file" onChange={handleFileChange} />
-
+                      <input className={EditEmpCSS.jm} type="file" onChange={handleFileChange} />
                       <div className='img-container'>
                         {image && (
                           <Cropper
@@ -259,7 +243,6 @@ const Example = () => {
                             guides={false}
                             crop={onCrop}
                             ref={cropperRef}
-                          // onChange={onCrop}
                           />
                         )}
                       </div>
@@ -284,9 +267,9 @@ const Example = () => {
                
                 </div>
               </div>
-              <div className="sc">
+              <div className={EditEmpCSS.sc}>
 
-                <div className='size'>
+                <div className={EditEmpCSS.size}>
                   <div>
                     <h3 htmlFor="">Edit name: </h3>
                     <input
@@ -303,7 +286,7 @@ const Example = () => {
 
                   }} onClick={changeName}>Edit</button>
                 </div>
-                <div className='size'>
+                <div className={EditEmpCSS.size}>
                   <div>
                     <h4 >Change status: </h4>
                     <select name="status" id="sta">
@@ -315,14 +298,9 @@ const Example = () => {
                     marginTop: '20px',
                     marginBottom: '20px',
                     border: '0.3px solid gray'
-
                   }} onClick={changeStatus}>Change</button>
                 </div>
               </div>
-          
-
-
-
           </div>
       </Container>
     </>
@@ -335,7 +313,6 @@ const ScrollButtons = ({ onScroll }) => {
       className="d-flex align-items-center mt-5"
       style={{ cursor: "pointer" }}
     >
-
     </div>
   );
 };
@@ -354,22 +331,19 @@ const ProductCard = ({ Name, pathPic,piclength }) => {
       setPicpath(currentPaths => currentPaths.filter(p => p !== path));
 
       console.log(response.data);
-      // If successful, do something here, like updating state or UI
-      window.location.href = `/tt/${name}`; // This will refresh the page
+      window.location.href = `/tt/${name}`;
     } catch (error) {
       console.error('Error deleting image:', error);
-      // Handle errors here, such as showing a message to the user
     }
     window.location.href = `/tt/${name}`;
   }
   return (
-    <div className="eleCard">
-      <div className="in">
-        <img className="imgCard" style={{ borderRadius: '0.5rem' }} src={getImagePath(Name, pathPic)} alt="" />
+    <div className={EditEmpCSS.eleCard}>
+      <div className={EditEmpCSS.in}>
+        <img className={EditEmpCSS.imgCard} style={{ borderRadius: '0.5rem' }} src={getImagePath(Name, pathPic)} alt="" />
 
-        <button className="btnD" onClick={() => DeleteImg(Name, pathPic)}>Delete</button>
+        <button className={EditEmpCSS.btnD} onClick={() => DeleteImg(Name, pathPic)}>Delete</button>
       </div>
-      {/* <div>{prodDetails.description}</div> */}
     </div>
   );
 };

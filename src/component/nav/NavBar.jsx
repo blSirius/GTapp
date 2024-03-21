@@ -77,6 +77,12 @@ function NavBar() {
           <NavLink to="/searchbyimg">Search By Image</NavLink>
         </li>
         <li>
+          <NavLink to="/allhistory">All Detection</NavLink>
+        </li>
+        <li>
+          <NavLink to="/greeting">Edit Greeting</NavLink>
+        </li>
+        <li>
         <Button variant='danger' onClick={handleLogOut} ><FontAwesomeIcon icon={faRightFromBracket} /></Button>
         </li>
       </ul>

@@ -3,7 +3,7 @@ import NavBar from './nav/NavBar'
 import { Button, Container, Pagination, Table } from 'react-bootstrap'
 import Form from 'react-bootstrap/Form';
 import axios from 'axios';
-import './style/Search.css';
+import HomeStyle from './style/HomeStyle.module.css';
 import { Pie, Line, Bar } from 'react-chartjs-2';
 import { Chart, ArcElement } from 'chart.js'
 
@@ -48,27 +48,6 @@ function Search() {
     getEmployee();
   }, [])
 
-
-  // useEffect(() => {
-  //   const sortedDetects = detectt.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  //   const timelineData = {
-  //     labels: sortedDetects.map(det => `${det.date} ${det.time}`), // Combine date and time for x-axis
-  //     datasets: [{
-  //       label: 'Expressions over time',
-  //       data: sortedDetects.map(det => ({
-  //         x: `${det.date} ${det.time}`,
-  //         y: emotionToScale(det.expression), // Convert the emotion to a numerical value
-  //       })),
-  //       backgroundColor: 'rgba(75,192,192,0.4)',
-  //       borderColor: 'rgba(75,192,192,1)',
-  //       borderWidth: 2,
-  //     }],
-  //   };
-
-  //   setChartData(timelineData);
-
-  // }, [detectt]);
 
 
   useEffect(() => {
@@ -121,24 +100,23 @@ function Search() {
       x: {
         // type: 'time',
         time: {
-          parser: 'DD/MM/YYYY HH:mm:ss', // กำหนดรูปแบบเวลาตามที่ข้อมูลของคุณเป็น
+          parser: 'DD/MM/YYYY HH:mm:ss', 
           tooltipFormat: 'DD/MM/YYYY HH:mm:ss',
           unit: 'minute',
           displayFormats: {
-            minute: 'HH:mm:ss' // แสดงเฉพาะเวลาถ้าวันเดียวกัน
+            minute: 'HH:mm:ss'
           }
         },
       },
       y: {
         type: 'category',
-        labels: ['surprised','happy','neutral', 'sad', 'angry', 'fearful',  'disgusted'] // Define your emotion categories here
+        labels: ['surprised','happy','neutral', 'sad', 'angry', 'fearful',  'disgusted'] 
       }
     },
     plugins: {
       tooltip: {
         callbacks: {
           label: function (context) {
-            // Use the 'emotion' property to display the emotion name in the tooltip
             return `${context.raw.emotion}: ${context.parsed.x}`;
           }
         }
@@ -151,35 +129,17 @@ function Search() {
   const indexOfLastEmployee = currentPage * employeesPerPage;
   const indexOfFirstEmployee = indexOfLastEmployee - employeesPerPage;
   const currentEmployees = employee.slice(indexOfFirstEmployee, indexOfLastEmployee);
-
-  // Change page
-//   useState(() => {
-//     const getDetect = async () => {
-//       try {
-//         const res = await axios.get(import.meta.env.VITE_API + `/getEmpDetect/${name}`);
-//         if (Array.isArray(res.data)) {
-//           setDetect(res.data);
-//         } else {
-//           console.error('Data received is not an array:', res.data);
-//         }
-//       } catch (err) {
-//         console.error('Error fetching data:', err);
-//       }
-//     };
-//     getDetect()
-//   }, [employee]);
   const getImagePath = (single_img) => {
     return import.meta.env.VITE_API + `/labeled_images/${single_img}`;
   };
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
   return (
     <>
       <NavBar />
       <Container>
-        <div className='ac'>
-          <div className='iac'>
-            <div className='tbp'>
+        <div className={HomeStyle.ac}>
+          <div className={HomeStyle.iac}>
+            <div className={HomeStyle.tbp}>
               <Table hover>
                 <thead>
                   <tr>
@@ -193,7 +153,6 @@ function Search() {
                 </thead>
                 <tbody>
                   {currentEmployees.map((data, key) => (
-
                     <tr key={key}>
                       <td>{key + 1}</td>
                       <td>{data.name}</td>
@@ -204,8 +163,6 @@ function Search() {
                     </tr>
                   ))}
                 </tbody>
-                
-
               </Table>
               <Pagination>
                   {[...Array(Math.ceil(employee.length / employeesPerPage)).keys()].map(number => (
@@ -215,26 +172,16 @@ function Search() {
                   ))}
                 </Pagination>
             </div>
-            <div className='fChart'>
-              {/* <h3>Expression Breakdown</h3> */}
+            <div className={HomeStyle.fchart}>
               {chartData.datasets.length > 0 && (
                 <Pie data={chartData} />
-
-
               )}
-
-
-
-
             </div>
-
           </div>
-          <div className='sChart'>
+          <div className={HomeStyle.sChart}>
             <h3>Expression Breakdown</h3>
             {chartDataline.datasets.length > 0 && (
               <Line ref={chartRef} options={chartOptionsline} data={chartDataline} />
-
-
             )}
           </div>
         </div>

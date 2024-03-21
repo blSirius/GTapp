@@ -27,6 +27,7 @@ import Modall from './component/ModalTest/Modal.jsx';
 import Example from './component/tt.jsx';
 import Conclude from './component/Conclude.jsx';
 import Greeting from './component/Greeting.jsx';
+import History from './component/History.jsx';
 
 //create router
 const router = createBrowserRouter([
@@ -60,39 +61,43 @@ const router = createBrowserRouter([
   },
   {
     path: '/viewEmp/:name',
-    element: <ViewEmp />
-  },
-  {
-    path: '/deleteEmp/:empID',
-    element: <DeleteEmp />
-  },
-  {
-    path: '/deleteEmp/',
-    element: <ProtectedRoute><Album /></ProtectedRoute>
+    element: <ProtectedRoute><ViewEmp /></ProtectedRoute>
   },
   {
     path: '/history/',
-    element: <Search/>
+    element: <ProtectedRoute><Search/></ProtectedRoute>
   },
   {
     path: '/searchbyimg/',
-    element: <TestSearchPic/>
+    element: <ProtectedRoute><TestSearchPic/></ProtectedRoute>
   },
   {
     path: '/tt/:name',
-    element: <Example/>
+    element: <ProtectedRoute><Example/></ProtectedRoute>
+  },
+  {
+    path: '/tt/',
+    element: <ProtectedRoute><Album/></ProtectedRoute>
   },
   {
     path: '/conclude',
-    element: <Conclude/>
+    element: <ProtectedRoute><Conclude/></ProtectedRoute>
   },
   {
     path: '/history/:name',
-    element: <Search/>
+    element: <ProtectedRoute><Search/></ProtectedRoute>
+  },
+  {
+    path: '/history/',
+    element: <ProtectedRoute><Conclude/></ProtectedRoute>
   },
   {
     path: '/greeting/',
-    element: <Greeting/>
+    element: <ProtectedRoute><Greeting/></ProtectedRoute>
+  },
+  {
+    path: '/allhistory/',
+    element: <ProtectedRoute><History/></ProtectedRoute>
   },
 
 

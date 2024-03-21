@@ -80,7 +80,7 @@
     border: 1px outset black;
     border-radius: 25px;
     padding: 1rem;
-    max-width: 70%;
+    /* max-width: 70%; */
     /* width: 50%; */
     /* width: 40%; */
 }
@@ -88,6 +88,7 @@
 .imgCard{
     width: 200px;
     height: 250px;
+    /* width: 500px; */
 }
 .btnD{
     background-color: #9DBC98;

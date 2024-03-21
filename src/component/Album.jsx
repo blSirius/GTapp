@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLockOpen, faCheck, faMagnifyingGlass, faPen, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 
 
+
 function Album() {
     const [employeeoff, setEmployeeoff] = useState([]);
     const [employee, setEmployee] = useState([]);
@@ -87,24 +88,41 @@ function Album() {
                     status: 'ON',
                 });
                 console.log(res.data);
-
-                // Assuming you want to navigate somewhere after status change
-                // navigate('/album'); 
             } catch (error) {
                 console.error('Error changing status:', error);
             }
             try {
                 const response = await axios.post(import.meta.env.VITE_API + '/updateStatusDB', { folderName: employee.employee_name, status: 'ON' });
                 console.log(response.data);
-                navigate('/album')
-                // Handle any additional UI updates or notifications here
+                // navigate('/album')
+                window.location.href = `/album`;
             } catch (error) {
                 console.error('Error renaming folder:', error);
-                // Handle displaying the error to the user here
             }
-            navigate('/album')
+            // navigate('/album')
         }
-
+    };
+    const DeleteEmp = async (employee) => {
+        if (window.confirm('Are you sure you want to Delete Employee?')) {
+            console.log(employee)
+            try {
+                const res = await axios.post(import.meta.env.VITE_API + '/deletefolder', {
+                    folderName: employee,
+                });
+                console.log(res.data);
+            } catch (error) {
+                console.error('Error changing status:', error);
+            }
+            try {
+                const response = await axios.post(import.meta.env.VITE_API + '/deleteDB', { folderName: employee});
+                console.log(response.data);
+                // navigate('/album')
+                window.location.href = `/album`;
+            } catch (error) {
+                console.error('??? :', error);
+            }
+            // navigate('/album')
+        }
     };
 
     return (
@@ -122,8 +140,6 @@ function Album() {
                                 <input id='on' placeholder='Search' style={{ width: '70%' }} type='text' />
                                 <Button style={{ width: '10%', margin: '1rem' }} ><FontAwesomeIcon onClick={searchOnData} icon={faMagnifyingGlass} /> </Button>
                             </div>
-
-
                             <Table hover>
                                 <thead>
                                     <tr>
@@ -145,9 +161,8 @@ function Album() {
                                         </tr>
                                     ))}
                                 </tbody>
-
                             </Table>
-                            <div className="pagination-container">
+                            <div className={AlbumCSS.paginationcontainer}>
                                 <Pagination>
                                     {[...Array(Math.ceil(employee.length / employeesPerPage)).keys()].map(number => (
                                         <Pagination.Item key={number + 1} active={number + 1 === currentPage} onClick={() => paginate(number + 1)}>
@@ -156,14 +171,11 @@ function Album() {
                                     ))}
                                 </Pagination>
                             </div>
-
-
-
                         </div>
                     ) : ''}
                     {employeeoff ? (
                         <div className={AlbumCSS.tb1container}>
-                            <div className='inin'>
+                            <div>
                                 <input id='off' placeholder='Search' style={{ width: '70%' }} type='text' />
                                 <Button style={{ width: '10%', margin: '1rem' }} ><FontAwesomeIcon onClick={searchOffData} icon={faMagnifyingGlass} /> </Button>
                             </div>
@@ -188,7 +200,7 @@ function Album() {
 
                                             <td style={{ textAlign: 'center' }}>
 
-                                                <Button href={`/tt/${data.employee_name}`} variant='success' style={{ backgroundColor: 'red', width: '80%' }}>
+                                                <Button onClick={() => DeleteEmp(data.employee_name)} variant='success' style={{ backgroundColor: 'red', width: '80%' }}>
                                                     <FontAwesomeIcon icon={faTrash} />
                                                 </Button>
                                             </td>
@@ -196,7 +208,7 @@ function Album() {
                                     ))}
                                 </tbody>
                             </Table>
-                            <div className="pagination-container">
+                            <div className={AlbumCSS.paginationcontainer}>
                                 <Pagination>
                                     {[...Array(Math.ceil(employeeoff.length / employeesPerPage)).keys()].map(number => (
                                         <Pagination.Item key={number + 1} active={number + 1 === currentPageOff} onClick={() => paginateOff(number + 1)}>
@@ -209,7 +221,7 @@ function Album() {
 
 
                         </div>
-                    ) : 'No status OFF'}
+                    ) : (<h1>No status off</h1>)}
 
 
                 </div>

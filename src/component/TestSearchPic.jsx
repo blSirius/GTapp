@@ -14,6 +14,7 @@ export default function TestSearchPic() {
   const [loading, setLoading] = useState(false);
   const [picpng, setpicPNG] = useState(null);
   const [data, setData] = useState([])
+  const [dataDummy, setDataDummy] = useState([])
   const [namefile, setNameFile] = useState([])
   // const [noface,setNoFace] = useState(null)
   const [copyname, setCopyname] = useState([])
@@ -30,7 +31,6 @@ export default function TestSearchPic() {
       // setLabels(labelsData.data);
       const labeledFaceDescriptors = await loadLabeledImage(labelsData.data);
       // console.log(labeledFaceDescriptors)
-
       const matcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.59);
       // console.log(matcher)
       setFaceMatcher(matcher);
@@ -68,7 +68,7 @@ export default function TestSearchPic() {
     matches.sort((a, b) => a.distance - b.distance);
 
     const pngFiles = matches
-      .filter(match => match.file && match.file.endsWith('.png' || '.jpg')) // Ensure the file ends with .png
+      .filter(match => match.file && match.file.endsWith('.png' || '.jpg'))
       .map(match => {
         // namefile.push(match.file)
         setNameFile(previousNames => [...previousNames, match.file]);
@@ -85,7 +85,7 @@ export default function TestSearchPic() {
     try {
       const response = await axios.get(import.meta.env.VITE_API + '/api/detectedSingleFace/files');
       // console.log(response.data)
-      return response.data; // Returns an array of file names
+      return response.data;
     } catch (error) {
       console.error("Error fetching the list of files", error);
       return [];
@@ -106,7 +106,6 @@ export default function TestSearchPic() {
           if (detections) {
             descriptions.push(detections.descriptor);
           } else {
-            // Handle the case where a face is not detected in the image
             console.warn(`No face detected in image ${fileName}`);
           }
         }
@@ -123,35 +122,39 @@ export default function TestSearchPic() {
 
   const filterbydate = async () => {
     try {
-        const startDate = document.getElementById('d1').value;
-        const stopDate = document.getElementById('d2').value;
-        if (!startDate) {
-            console.log('No start date provided');
-            return;
-        }
-        if (startDate > stopDate && stopDate) {
-            alert('Start date cannot be greater than end date.');
-            console.log('ngo');
-            return
-        }
-        // console.log(startDate)
-        setData([])
-     
-          const url = new URL(import.meta.env.VITE_API + `/getEmpDetect/${namefile}`);
-          url.searchParams.append('dateStart', startDate);
-          if (stopDate) {
-              url.searchParams.append('dateStop', stopDate);
-          }
-          
-          const res = await axios.get(url.toString());
-          setData(res.data)
-          // console.log(res.data)
-        
-        // console.log(data)
+      const startDate = document.getElementById('d1').value;
+      const stopDate = document.getElementById('d2').value;
+      if (!startDate) {
+        console.log('No start date provided');
+        return;
+      }
+      if (startDate > stopDate && stopDate) {
+        alert('Start date cannot be greater than end date.');
+        console.log('ngo');
+        return
+      }
+      // console.log('Before Set Date: '+dataDummy)
+      setDataDummy([])
+      console.log('TETSTTSTSTS: ' + dataDummy)
+      const url = new URL(import.meta.env.VITE_API + `/getEmpDetect/${namefile}`);
+      url.searchParams.append('dateStart', startDate);
+      if (stopDate) {
+        url.searchParams.append('dateStop', stopDate);
+      }
+
+      const res = await axios.get(url.toString());
+
+      console.log("res.data is: " + res.data)
+      setDataDummy(res.data)
+      // console.log('After Set Date: '+dataDummy)
+
+
+
+      // console.log(dataDummy)
     } catch (err) {
-        console.log('Error fetching data:', err.message);
+      console.log('Error fetching data:', err.message);
     }
-};
+  };
 
   const handleImageUpload = async event => {
     if (event.target.files && event.target.files.length > 0 && faceMatcher) {
@@ -160,9 +163,11 @@ export default function TestSearchPic() {
       setpicPNG(null)
       const imgFile = event.target.files[0];
       const img = await faceapi.bufferToImage(imgFile);
+
+      console.log('img is: ' + img[0])
       const canvas = canvasRef.current;
-      const desiredWidth = 700;  // เปลี่ยนค่านี้เป็นขนาดที่คุณต้องการ
-      const desiredHeight = 527; // เปลี่ยนค่านี้เป็นขนาดที่คุณต้องการ
+      const desiredWidth = 700;
+      const desiredHeight = 527;
       const aspectRatio = img.width / img.height;
       if (img.width > img.height) {
         canvas.width = desiredWidth;
@@ -207,12 +212,14 @@ export default function TestSearchPic() {
             namefile.push(bestMatch.toString())
             // setNameFile(bestMatch)
             saveMatchedName([bestMatch]);
+            console.log('best match : ' + bestMatch)
           }
           // console.log('NFNFNNFNF'+namefile)
           const box = detection.detection.box;
           const drawBox = new faceapi.draw.DrawBox(box, { label: bestMatch.toString() });
           drawBox.draw(canvas);
         });
+        setDataDummy(data)
       }
     }
     // {data.map((item, key) => (
@@ -221,41 +228,43 @@ export default function TestSearchPic() {
     //  console.log('ttttttttt'+data)
     console.log("saddsadassaddsasdaas" + namefile)
   };
-  const saveMatchedName = (matches) => {
-    const getDetect = async () => {
-      try {
-        let fetchPromises = [];
-        for (const match of matches) {
-          // console.log('Match is'+match)
-          // setCopyname(prevData => [...prevData, ...match]);
-          const name = match.toString().split(' ')[0];
-          fetchPromises.push(axios.get(import.meta.env.VITE_API + `/getEmpDetect/${name}`));
-        }
-        const results = await Promise.all(fetchPromises);
-        const newCombinedData = results.reduce((acc, res) => {
-          if (Array.isArray(res.data) && res.data.length > 0) {
-            return acc.concat(res.data);
-          }
-          return acc;
-        }, []);
-
-        // Combine new data with existing state data
-        // setCopyname(prevData => [...prevData, ...newCombinedData.path]);
-        setData(prevData => [...prevData, ...newCombinedData]);
-        // console.log('Data set in state:', newCombinedData);
-        // console.log("COPY IS "+copyname)
-      } catch (err) {
-        console.error('Error fetching data:', err);
+  const saveMatchedName = async (matches) => {
+    // const getDetect = async () => {
+    try {
+      let fetchPromises = [];
+      for (const match of matches) {
+        // console.log('Match is'+match)
+        // setCopyname(prevData => [...prevData, ...match]);
+        const name = match.toString().split(' ')[0];
+        fetchPromises.push(axios.get(import.meta.env.VITE_API + `/getEmpDetect/${name}`));
       }
-    };
 
-    getDetect();
+      const results = await Promise.all(fetchPromises);
+      const newCombinedData = results.reduce((acc, res) => {
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setDataDummy(prevData => [...prevData, ...res.data])
+          // console.log(res)
+          return acc.concat(res.data);
+        }
+        return acc;
+      }, []);
+
+      // setCopyname(prevData => [...prevData, ...newCombinedData.path]);
+      setData(prevData => [...prevData, ...newCombinedData]);
+      // console.log(data)
+      // console.log('Data set in state:', newCombinedData);
+      // console.log("COPY IS "+copyname)
+    } catch (err) {
+      console.error('Error fetching data:', err);
+    }
+    // console.log('Data is: '+data)
+    // setDataDummy(data)
+    // };
+
+    // getDetect();
     // console.log(copyname)
 
   };
-  const check = () => {
-    console.log(namefile)
-  }
 
   return (
     <>
@@ -277,12 +286,12 @@ export default function TestSearchPic() {
         </div>
         <div className="contentContainer">
           <canvas ref={canvasRef} className="testSearchPicCanvas" />
-          {picpng||1 ? (
+          {picpng || 1 ? (
             <div className="tableContainer">
               <label>Date Length:</label>
               <input id='d1' type='date' />
-                        <label> -</label>
-                        <input id='d2'  type='date' />
+              <label> -</label>
+              <input id='d2' type='date' />
               <Button onClick={filterbydate} style={{ width: '10%', marginLeft: '1rem' }}> <FontAwesomeIcon icon={faSearch} /></Button>
               <Table style={{ marginTop: '3rem' }} hover>
                 <thead >
@@ -297,7 +306,7 @@ export default function TestSearchPic() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.map((item, key) => (
+                  {dataDummy.map((item, key) => (
                     <tr key={key}>
                       <td>{key + 1}</td>
                       <td>{item.name}</td>
